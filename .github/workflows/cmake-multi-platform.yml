@@ -20,8 +20,8 @@ jobs:
       with:
         path: |
           RealEngine/vendor
-        key: submodule-${{ hashFiles('**/CMakeLists.txt') }}
-        enableCrossOsArchive: true
+          build/RealEngine/vendor
+        key: ${{ runner.os }}-submodule-${{ hashFiles('**/CMakeLists.txt') }}
 
     - name: Update git submodules
       if: steps.cache-submodule.outputs.cache-hit != 'true'
@@ -53,8 +53,8 @@ jobs:
         with:
           path: |
             RealEngine/vendor
-          key: submodule-${{ hashFiles('**/CMakeLists.txt') }}
-          enableCrossOsArchive: true
+            build/RealEngine/vendor
+          key: ${{ runner.os }}-submodule-${{ hashFiles('**/CMakeLists.txt') }}
 
       - name: Update git submodules
         if: steps.cache-submodule.outputs.cache-hit != 'true'
