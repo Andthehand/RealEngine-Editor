@@ -20,7 +20,7 @@ jobs:
       with:
         path: |
           RealEngine/vendor
-        key: ${{ runner.os }}-submodule-${{ hashFiles('**/CMakeLists.txt') }}
+        key: submodule-${{ hashFiles('**/CMakeLists.txt') }}
         enableCrossOsArchive: true
 
     - name: Update git submodules
@@ -53,7 +53,7 @@ jobs:
         with:
           path: |
             RealEngine/vendor
-          key: ${{ runner.os }}-submodule-${{ hashFiles('**/CMakeLists.txt') }}
+          key: submodule-${{ hashFiles('**/CMakeLists.txt') }}
           enableCrossOsArchive: true
 
       - name: Update git submodules
