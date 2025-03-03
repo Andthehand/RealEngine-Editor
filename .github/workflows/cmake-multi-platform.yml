@@ -21,7 +21,7 @@ jobs:
         path: |
           RealEngine
           build/RealEngine
-        key: ${{ runner.os }}-submodule-${{ hashFiles('RealEngine/**/CMakeLists.txt') }}
+        key: ${{ runner.os }}-submodules
 
     - name: Update git submodules
       if: steps.cache-submodule.outputs.cache-hit != 'true'
@@ -55,7 +55,7 @@ jobs:
           path: |
             RealEngine
             build/RealEngine
-          key: ${{ runner.os }}-submodule-${{ hashFiles('RealEngine/**/CMakeLists.txt') }}
+          key: ${{ runner.os }}-submodules
 
       - name: Update git submodules
         if: steps.cache-submodule.outputs.cache-hit != 'true'
@@ -64,9 +64,10 @@ jobs:
           submodules: recursive
 
       - name: Install dependencies
-        run: |
-          sudo apt update
-          sudo apt install libwayland-dev libxkbcommon-dev xorg-dev
+        uses: awalsh128/cache-apt-pkgs-action@latest
+        with:
+          packages: libwayland-dev libxkbcommon-dev xorg-dev
+          version: 1.0
   
       - name: Configure CMake
         run: >
