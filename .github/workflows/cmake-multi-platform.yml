@@ -55,8 +55,9 @@ jobs:
   
       - name: Submodule Hash
         id: submodule-hash
-        run: |
-          echo "SUBMODULE_ID=$(git submodule | md5sum)" >> $GITHUB_OUTPUT
+        uses: Andthehand/submodule-version-hash-action@main
+        with: 
+          path: './'
 
       - name : Cache Submodules
         id: cache-submodule
@@ -65,7 +66,7 @@ jobs:
           path: |
             RealEngine
             build/RealEngine
-          key: ${{ runner.os }}-submodules-${{ steps.submodule-hash.outputs.SUBMODULE_ID }}
+          key: ${{ runner.os }}-submodules-${{ steps.submodule-hash.outputs.sha256 }}
 
       - name: Update git submodules
         if: steps.cache-submodule.outputs.cache-hit != 'true'
