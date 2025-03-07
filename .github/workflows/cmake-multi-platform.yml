@@ -13,20 +13,23 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
-  
+      with:
+          submodules: true # Pull down RealEngine then check if we have a chache for it's submodules
+
     - name: Submodule Hash
       id: submodule-hash
-      run: |
-        echo "SUBMODULE_ID=$(( git submodule > hash.txt ) | certutil -hashfile hash.txt SHA256 | findstr /v "hash")" >> $env:GITHUB_OUTPUT
-    
-    - name: Cache Submodules
+      uses: Andthehand/submodule-version-hash-action@main
+      with: 
+        path: './RealEngine'
+
+    - name : Cache Submodules
       id: cache-submodule
       uses: actions/cache@v4
       with:
         path: |
-          RealEngine
-          build/RealEngine
-        key: ${{ runner.os }}-submodules-${{ steps.submodule-hash.outputs.SUBMODULE_ID }}
+          RealEngine/vendor
+          build/RealEngine/vendor
+        key: ${{ runner.os }}-submodules-${{ steps.submodule-hash.outputs.sha256 }}
 
     - name: Update git submodules
       if: steps.cache-submodule.outputs.cache-hit != 'true'
@@ -52,27 +55,29 @@ jobs:
       steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          submodules: true # Pull down RealEngine then check if we have a chache for it's submodules
   
       - name: Submodule Hash
         id: submodule-hash
         uses: Andthehand/submodule-version-hash-action@main
         with: 
-          path: './'
+          path: './RealEngine'
 
       - name : Cache Submodules
         id: cache-submodule
         uses: actions/cache@v4
         with:
           path: |
-            RealEngine
-            build/RealEngine
+            RealEngine/vendor
+            build/RealEngine/vendor
           key: ${{ runner.os }}-submodules-${{ steps.submodule-hash.outputs.sha256 }}
 
       - name: Update git submodules
         if: steps.cache-submodule.outputs.cache-hit != 'true'
         uses: actions/checkout@v4
         with:
-          submodules: recursive
+          submodules: recursive # The submodules changed inside of RealEngine
 
       - name: Install dependencies
         uses: awalsh128/cache-apt-pkgs-action@latest
