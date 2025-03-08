@@ -22,7 +22,7 @@ namespace RealEngine {
 	void EditorLayer::OnDetach() {
 	}
 
-	void EditorLayer::OnUpdate() {
+	void EditorLayer::OnUpdate(const float deltaTime) {
 		RE_PROFILE_FUNCTION();
 
 		m_Framebuffer->Bind();
