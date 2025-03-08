@@ -13,7 +13,7 @@ namespace RealEngine {
 
 		virtual void OnAttach() override;
 		virtual void OnDetach() override;
-		virtual void OnUpdate() override;
+		virtual void OnUpdate(const float deltaTime) override;
 		virtual void OnImGui() override;
 		virtual void OnEvent(Event& event) override;
 
