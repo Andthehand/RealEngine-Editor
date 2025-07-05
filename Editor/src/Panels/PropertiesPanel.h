@@ -6,6 +6,13 @@
 #include <filesystem>
 
 namespace RealEngine {
+	/**
+	 * @class PropertiesPanel
+	 * @brief A UI panel that displays and manages properties of the selected folder.
+	 *
+	 * This panel allows inspection of directory metadata and displays runtime statistics
+	 * such as frame rate. It handles folder selection events and integrates with ImGui.
+	 */
 	class PropertiesPanel : public Panel {
 	public:
 		PropertiesPanel();

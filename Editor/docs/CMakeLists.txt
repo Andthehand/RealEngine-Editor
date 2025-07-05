@@ -1,0 +1,24 @@
+find_package(Doxygen REQUIRED)
+
+set(HEADER_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../src")
+file(GLOB_RECURSE PUBLIC_HEADERS "${HEADER_DIR}/*.h")
+
+set(DOXYGEN_INPUT_DIR ${HEADER_DIR})
+set(DOXYGEN_OUTPUT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/doxygen)
+set(DOXYGEN_INDEX_FILE ${DOXYGEN_OUTPUT_DIR}/xml/index.xml)
+set(DOXYGEN_MD_FILE ${CMAKE_CURRENT_SOURCE_DIR}/FILES.md)
+set(DOXYFILE_IN ${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in)
+set(DOXYFILE_OUT ${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.tmp)
+
+set(REALENGINE_DOCS ${RealEngine_SOURCE_DIR}/docs)
+
+#Replace variables inside @@ with the current values
+configure_file(${DOXYFILE_IN} ${DOXYFILE_OUT} @ONLY)
+
+add_custom_command(OUTPUT ${DOXYGEN_INDEX_FILE}
+        DEPENDS ${PUBLIC_HEADERS} ${REALENGINE_DOCS}/RealEngine.tag
+        COMMAND ${DOXYGEN_EXECUTABLE} ${DOXYFILE_OUT}
+        MAIN_DEPENDENCY ${DOXYFILE_OUT} ${DOXYFILE_IN}
+        COMMENT "Generating docs")
+
+add_custom_target(Editor-Doxygen ALL DEPENDS ${DOXYGEN_INDEX_FILE} ${REALENGINE_DOCS}/RealEngine.tag)

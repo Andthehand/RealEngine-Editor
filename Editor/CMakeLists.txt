@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.20)
 
 project(Editor)
 
+option(BUILD_DOCS "Build Doxygen docs" OFF)
+
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
@@ -16,3 +18,7 @@ include_directories(Editor PRIVATE
 target_link_libraries(Editor RealEngine)
 
 file(COPY assets DESTINATION "${CMAKE_BINARY_DIR}/Editor")
+
+if(BUILD_DOCS)
+	add_subdirectory(docs)
+endif(BUILD_DOCS)
