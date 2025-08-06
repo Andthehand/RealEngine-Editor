@@ -12,6 +12,7 @@ namespace RealEngine {
 	public:
 		Panel() = default;
 		virtual ~Panel() = default;
+
 		virtual void OnImGui() = 0;
 	public:
 		/// Controls whether the panel is visible in the UI.

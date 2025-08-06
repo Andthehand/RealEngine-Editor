@@ -25,6 +25,8 @@ namespace RealEngine {
 		virtual void OnEvent(Event& event) override;
 
 	private:
+		Ref<Scene> m_ActiveScene;
+
 		/// Framebuffer used to render the scene in the editor viewport.
 		Ref<Framebuffer> m_Framebuffer;
 		glm::vec2 m_ViewportSize = { 0.0f, 0.0f };

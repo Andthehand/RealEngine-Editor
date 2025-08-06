@@ -17,6 +17,9 @@ namespace RealEngine {
 		spec.Attachments = { FramebufferTextureFormat::RGBA8 };
 
 		m_Framebuffer = CreateRef<Framebuffer>(spec);
+
+		m_ActiveScene = CreateRef<Scene>();
+		m_ActiveScene->CreateEntity("Test");
 	}
 
 	void EditorLayer::OnDetach() {
@@ -28,8 +31,8 @@ namespace RealEngine {
 		m_Framebuffer->Bind();
 		RenderCommands::Clear();
 
-		Renderer::Get()->DrawQuad({ 0.0f, 0.0f, 0.0f });
-		Renderer::Get()->Render();
+		m_ActiveScene->OnUpdate(deltaTime);
+		Renderer::Render();
 
 		m_Framebuffer->Unbind();
 	}
