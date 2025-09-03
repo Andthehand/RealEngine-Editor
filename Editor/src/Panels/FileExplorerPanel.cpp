@@ -21,7 +21,7 @@ namespace RealEngine {
 			const auto& path = entry.path();
 			if (ImGui::Button(path.filename().string().c_str())) {
 				PannelFolderSelectEvent event(path);
-				Application::Get().OnEvent(event);
+				RE_RAISE_EVENT(event);
 			}
 			
 			if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left) 

@@ -18,8 +18,12 @@ namespace RealEngine {
 
 		m_Framebuffer = CreateRef<Framebuffer>(spec);
 
+		//m_ActiveScene = CreateRef<Scene>("test.yaml");
 		m_ActiveScene = CreateRef<Scene>();
-		m_ActiveScene->CreateEntity("Test");
+		m_ActiveScene->CreateEntity("Camera").AddComponent<TransformComponent>();
+		m_ActiveScene->CreateEntity("Test entity").AddComponent<TransformComponent>();
+		m_ActiveScene->Serialize("test.yaml");
+		m_SceneHierarchyPanel = SceneHierarchyPanel(m_ActiveScene);
 	}
 
 	void EditorLayer::OnDetach() {
@@ -73,6 +77,7 @@ namespace RealEngine {
 			if (ImGui::BeginMenu("View")) {
 				ImGui::MenuItem("Properties", NULL, &m_PropertiesPanel.IsVisible);
 				ImGui::MenuItem("FileExplorer", NULL, &m_FileExplorerPanel.IsVisible);
+				ImGui::MenuItem("SceneHierarchy", NULL, &m_SceneHierarchyPanel.IsVisible);
 
 				ImGui::EndMenu();
 			}
@@ -92,6 +97,8 @@ namespace RealEngine {
 			m_PropertiesPanel.OnImGui();
 		if (m_FileExplorerPanel.IsVisible)
 			m_FileExplorerPanel.OnImGui();
+		if (m_SceneHierarchyPanel.IsVisible)
+			m_SceneHierarchyPanel.OnImGui();
 
 		ImGui::End();
 
@@ -111,7 +118,7 @@ namespace RealEngine {
 		ImGui::End();
 		ImGui::PopStyleVar();
 
-		//ImGui::ShowDemoWindow();
+		ImGui::ShowDemoWindow();
 	}
 
 	void EditorLayer::OnEvent(Event& event) {

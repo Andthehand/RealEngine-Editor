@@ -15,14 +15,24 @@ namespace RealEngine {
 	 */
 	class PropertiesPanel : public Panel {
 	public:
-		PropertiesPanel();
+		PropertiesPanel() = default;
 		~PropertiesPanel() = default;
 
-		void SelectFolder(const std::filesystem::path& path);
+		void ShowFolderProperties();
+		void ShowEntityProperties();
 
 		virtual void OnImGui() override;
 		void OnEvent(Event& event);
 	private:
 		std::filesystem::path m_SelectedFolder = "";
+		Entity m_SelectedEntity;
+
+		enum class CurrentView {
+			FolderView,
+			EntityView,
+			None
+		};
+
+		CurrentView m_CurrentView = CurrentView::None;
 	};
 }

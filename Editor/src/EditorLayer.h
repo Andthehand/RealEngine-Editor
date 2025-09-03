@@ -3,6 +3,7 @@
 
 #include "Panels/FileExplorerPanel.h"
 #include "Panels/PropertiesPanel.h"
+#include "Panels/SceneHierarchyPanel.h"
 
 #include <glm/glm.hpp>
 
@@ -35,5 +36,8 @@ namespace RealEngine {
 		FileExplorerPanel m_FileExplorerPanel;
 		/// Properties panel for displaying and editing object properties.
 		PropertiesPanel m_PropertiesPanel;
+
+		/// Scene hierarchy panel for managing entities in the current scene.
+		SceneHierarchyPanel m_SceneHierarchyPanel;
 	};
 }
