@@ -53,7 +53,7 @@ namespace RealEngine {
 		RE_PROFILE_FUNCTION();
 
 		EventDispatcher dispatcher(event);
-		dispatcher.Dispatch<PannelFolderSelectEvent>([this](PannelFolderSelectEvent& e) {
+		dispatcher.Dispatch<PanelFolderSelectEvent>([this](PanelFolderSelectEvent& e) {
 			m_SelectedFolder = e.GetPath();
 			m_CurrentView = CurrentView::FolderView;
 			return true;

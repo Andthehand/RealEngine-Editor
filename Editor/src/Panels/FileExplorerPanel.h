@@ -2,6 +2,7 @@
 #include <filesystem>
 
 #include "Panel.h"
+#include "RealEngine.h"
 
 namespace RealEngine {
 	/**
@@ -18,6 +19,20 @@ namespace RealEngine {
 
 		virtual void OnImGui() override;
 	private:
+		// Rendering steps broken out from OnImGui for clarity & testability
+		void DrawNavigationBar();
+		int  CalculateColumnCount() const;
+		bool BeginFileTable(int columnCount);
+		void DrawDirectoryEntries(int columnCount);
+		void DrawEntry(const std::filesystem::directory_entry& entry, int index, int columnCount);
+		void EndFileTable();
+
+	private:
 		std::filesystem::path m_CurrentDirectory;
+
+		Ref<Texture2D> m_FolderIcon;
+		Ref<Texture2D> m_FileIcon;
+
+		static constexpr float FILE_ICON_SIZE = 96.0f;
 	};
 }
