@@ -4,6 +4,7 @@
 #include "Panels/FileExplorerPanel.h"
 #include "Panels/PropertiesPanel.h"
 #include "Panels/SceneHierarchyPanel.h"
+#include "Panels/StatusPanel.h"
 
 #include <glm/glm.hpp>
 
@@ -26,11 +27,23 @@ namespace RealEngine {
 		virtual void OnEvent(Event& event) override;
 
 	private:
+		void StartDockspace();
+		void EndDockspace();
+	private:
+		enum class SceneState {
+			Edit = 0,
+			Play = 1
+		};
+
+		SceneState m_SceneState = SceneState::Edit;
 		Ref<Scene> m_ActiveScene;
 
 		/// Framebuffer used to render the scene in the editor viewport.
+		static constexpr float MIN_DOCKED_WINDOW_SIZE = 250.0f;
+
 		Ref<Framebuffer> m_Framebuffer;
 		glm::vec2 m_ViewportSize = { 0.0f, 0.0f };
+		EditorCamera m_EditorCamera;
 
 		/// File explorer panel for browsing assets and directories.
 		FileExplorerPanel m_FileExplorerPanel;
@@ -39,5 +52,7 @@ namespace RealEngine {
 
 		/// Scene hierarchy panel for managing entities in the current scene.
 		SceneHierarchyPanel m_SceneHierarchyPanel;
+
+		StatusPanel m_StatusPanel;
 	};
 }

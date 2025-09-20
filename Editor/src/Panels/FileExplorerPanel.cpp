@@ -17,14 +17,14 @@ namespace RealEngine {
 	void FileExplorerPanel::OnImGui() {
 		RE_PROFILE_FUNCTION();
 
-		ImGui::Begin("File Explorer");
+		if (ImGui::Begin("File Explorer")) {
+			DrawNavigationBar();
 
-		DrawNavigationBar();
-
-		const int columnCount = CalculateColumnCount();
-		if (BeginFileTable(columnCount)) {
-			DrawDirectoryEntries(columnCount);
-			EndFileTable();
+			const int columnCount = CalculateColumnCount();
+			if (BeginFileTable(columnCount)) {
+				DrawDirectoryEntries(columnCount);
+				EndFileTable();
+			}
 		}
 
 		ImGui::End();
@@ -42,6 +42,7 @@ namespace RealEngine {
 		float panelWidth = ImGui::GetContentRegionAvail().x;
 		float padding = ImGui::GetStyle().CellPadding.x;
 		int columnCount = static_cast<int>(panelWidth / (FILE_ICON_SIZE + padding));
+
 		return columnCount < 1 ? 1 : columnCount;
 	}
 
@@ -62,7 +63,7 @@ namespace RealEngine {
 		int i = 0;
 		for (const auto& entry : std::filesystem::directory_iterator(m_CurrentDirectory)) {
 			DrawEntry(entry, i, columnCount);
-			++i;
+			i++;
 		}
 	}
 

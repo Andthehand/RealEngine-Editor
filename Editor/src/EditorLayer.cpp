@@ -4,7 +4,7 @@
 
 namespace RealEngine {
 	EditorLayer::EditorLayer()
-		: Layer("Editor") {}
+		: Layer("Editor"), m_EditorCamera(90.0f, Application::Get().GetWindow().GetAspectRatio(), 0.0f, 1000.0f) { }
 
 	void EditorLayer::OnAttach() {
 		RE_PROFILE_FUNCTION();
@@ -17,12 +17,16 @@ namespace RealEngine {
 		spec.Attachments = { FramebufferTextureFormat::RGBA8 };
 
 		m_Framebuffer = CreateRef<Framebuffer>(spec);
+		m_EditorCamera.SetViewportSize((float)spec.Width, (float)spec.Height);
 
 		//m_ActiveScene = CreateRef<Scene>("test.yaml");
 		m_ActiveScene = CreateRef<Scene>();
-		m_ActiveScene->CreateEntity("Camera").AddComponent<TransformComponent>();
-		m_ActiveScene->CreateEntity("Test entity").AddComponent<TransformComponent>();
-		m_ActiveScene->Serialize("test.yaml");
+
+		Entity testEntity = m_ActiveScene->CreateEntity("Test entity");
+		testEntity.AddComponent<TransformComponent>();
+		testEntity.AddComponent<SpriteRendererComponent>(glm::vec4(1.0f, 0.0f, 1.0f, 1.0f));
+
+		//m_ActiveScene->Serialize("test.yaml");
 		m_SceneHierarchyPanel = SceneHierarchyPanel(m_ActiveScene);
 	}
 
@@ -35,8 +39,16 @@ namespace RealEngine {
 		m_Framebuffer->Bind();
 		RenderCommands::Clear();
 
-		m_ActiveScene->OnUpdate(deltaTime);
-		Renderer::Render();
+		switch (m_SceneState) {
+			case SceneState::Edit:
+				m_EditorCamera.OnUpdate(deltaTime);
+
+				m_ActiveScene->OnUpdateEditor(deltaTime, m_EditorCamera);
+				break;
+			case SceneState::Play:
+				m_ActiveScene->OnUpdateRuntime(deltaTime);
+				break;
+		}
 
 		m_Framebuffer->Unbind();
 	}
@@ -44,27 +56,7 @@ namespace RealEngine {
 	void EditorLayer::OnImGui() {
 		RE_PROFILE_FUNCTION();
 
-		static bool s_DockspaceOpen = true;
-		static ImGuiWindowFlags window_flags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking 
-			| ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize 
-			| ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
-		static ImGuiDockNodeFlags dockspace_flags = ImGuiDockNodeFlags_None;
-
-		ImGuiViewport* viewport = ImGui::GetMainViewport();
-		ImGui::SetNextWindowPos(viewport->Pos);
-		ImGui::SetNextWindowSize(viewport->Size);
-		ImGui::SetNextWindowViewport(viewport->ID);
-
-		ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
-		ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
-		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
-
-		ImGui::Begin("DockSpace Demo", &s_DockspaceOpen, window_flags);
-
-		ImGui::PopStyleVar(3);
-
-		ImGuiID dockspace_id = ImGui::GetID("MyDockSpace");
-		ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), dockspace_flags);
+		StartDockspace();
 
 		if(ImGui::BeginMenuBar()) {
 			if(ImGui::BeginMenu("File")) {
@@ -78,6 +70,7 @@ namespace RealEngine {
 				ImGui::MenuItem("Properties", NULL, &m_PropertiesPanel.IsVisible);
 				ImGui::MenuItem("FileExplorer", NULL, &m_FileExplorerPanel.IsVisible);
 				ImGui::MenuItem("SceneHierarchy", NULL, &m_SceneHierarchyPanel.IsVisible);
+				ImGui::MenuItem("Status", NULL, &m_StatusPanel.IsVisible);
 
 				ImGui::EndMenu();
 			}
@@ -99,8 +92,8 @@ namespace RealEngine {
 			m_FileExplorerPanel.OnImGui();
 		if (m_SceneHierarchyPanel.IsVisible)
 			m_SceneHierarchyPanel.OnImGui();
-
-		ImGui::End();
+		if (m_StatusPanel.IsVisible)
+			m_StatusPanel.OnImGui();
 
 		//ImGui Viewport Window/Panel
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
@@ -118,12 +111,47 @@ namespace RealEngine {
 		ImGui::End();
 		ImGui::PopStyleVar();
 
+		EndDockspace();
+
 		ImGui::ShowDemoWindow();
 	}
 
 	void EditorLayer::OnEvent(Event& event) {
 		RE_PROFILE_FUNCTION();
 
+		m_EditorCamera.OnEvent(event);
 		m_PropertiesPanel.OnEvent(event);
+	}
+
+	void EditorLayer::StartDockspace() {
+		static bool s_DockspaceOpen = true;
+		static ImGuiWindowFlags window_flags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking
+			| ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize
+			| ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
+		static ImGuiDockNodeFlags dockspace_flags = ImGuiDockNodeFlags_None;
+
+		ImGuiViewport* viewport = ImGui::GetMainViewport();
+		ImGui::SetNextWindowPos(viewport->Pos);
+		ImGui::SetNextWindowSize(viewport->Size);
+		ImGui::SetNextWindowViewport(viewport->ID);
+
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
+
+		ImGui::Begin("DockSpace Demo", &s_DockspaceOpen, window_flags);
+
+		ImGui::PopStyleVar(3);
+
+		// Sets the minimum window size for docked windows
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowMinSize, ImVec2(MIN_DOCKED_WINDOW_SIZE, ImGui::GetFrameHeight()));
+		// Starts the dockspace
+		ImGuiID dockspace_id = ImGui::GetID("MyDockSpace");
+		ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), dockspace_flags);
+		ImGui::PopStyleVar();
+	}
+
+	void EditorLayer::EndDockspace() {
+		ImGui::End();
 	}
 }

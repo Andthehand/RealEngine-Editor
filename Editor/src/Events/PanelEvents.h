@@ -22,9 +22,9 @@ namespace RealEngine {
 		const std::filesystem::path m_Path;
 	};
 
-	class PannelEntitySelectEvent : public Event {
+	class PanelEntitySelectEvent : public Event {
 	public:
-		PannelEntitySelectEvent(const Entity entityID)
+		PanelEntitySelectEvent(const Entity entityID)
 			: m_Entity(entityID) {
 		}
 
@@ -34,7 +34,7 @@ namespace RealEngine {
 			std::stringstream ss;
 
 			const TagComponent& tag = m_Entity.GetComponent<TagComponent>();
-			ss << "PannelEntitySelectEvent: " << tag.Tag;
+			ss << "PanelEntitySelectEvent: " << tag.Tag;
 
 			return ss.str();
 		}
@@ -42,5 +42,16 @@ namespace RealEngine {
 		EVENT_CLASS_TYPE(PannelEntitySelect)
 	private:
 		Entity m_Entity;
+	};
+
+	class PanelEntityDeselectEvent : public Event {
+	public:
+		PanelEntityDeselectEvent() = default;
+		
+		virtual std::string ToString() const override {
+			return "PanelEntityDeselectEvent";
+		}
+
+		EVENT_CLASS_TYPE(PanelEntityDeselect)
 	};
 }

@@ -18,11 +18,19 @@ namespace RealEngine {
 		PropertiesPanel() = default;
 		~PropertiesPanel() = default;
 
-		void ShowFolderProperties();
-		void ShowEntityProperties();
-
 		virtual void OnImGui() override;
 		void OnEvent(Event& event);
+	private:
+		template<typename T>
+		void DisplayComponent(T* component);
+		template<typename... Components>
+		void DisplayComponents(ComponentList::ComponentGroup<Components...>);
+
+		template<typename... Components>
+		void DisplayAddComponentEntries(ComponentList::ComponentGroup<Components...>);
+
+		void ShowFolderProperties();
+		void ShowEntityProperties();
 	private:
 		std::filesystem::path m_SelectedFolder = "";
 		Entity m_SelectedEntity;
