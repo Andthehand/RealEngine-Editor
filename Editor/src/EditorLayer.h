@@ -29,6 +29,8 @@ namespace RealEngine {
 	private:
 		void StartDockspace();
 		void EndDockspace();
+
+		void CheckShortcuts();
 	private:
 		enum class SceneState {
 			Edit = 0,
@@ -36,6 +38,7 @@ namespace RealEngine {
 		};
 
 		SceneState m_SceneState = SceneState::Edit;
+		Ref<Project> m_CurrentProject;
 		Ref<Scene> m_ActiveScene;
 
 		/// Framebuffer used to render the scene in the editor viewport.

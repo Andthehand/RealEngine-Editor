@@ -19,14 +19,10 @@ namespace RealEngine {
 		m_Framebuffer = CreateRef<Framebuffer>(spec);
 		m_EditorCamera.SetViewportSize((float)spec.Width, (float)spec.Height);
 
-		//m_ActiveScene = CreateRef<Scene>("test.yaml");
-		m_ActiveScene = CreateRef<Scene>();
 
-		Entity testEntity = m_ActiveScene->CreateEntity("Test entity");
-		testEntity.AddComponent<TransformComponent>();
-		testEntity.AddComponent<SpriteRendererComponent>(glm::vec4(1.0f, 0.0f, 1.0f, 1.0f));
+		m_CurrentProject = CreateRef<Project>("ExampleProject/ExampleProject.reproj");
+		m_ActiveScene = m_CurrentProject->GetCurrentScene();
 
-		//m_ActiveScene->Serialize("test.yaml");
 		m_SceneHierarchyPanel = SceneHierarchyPanel(m_ActiveScene);
 	}
 
@@ -57,11 +53,17 @@ namespace RealEngine {
 		RE_PROFILE_FUNCTION();
 
 		StartDockspace();
+		CheckShortcuts();
 
-		if(ImGui::BeginMenuBar()) {
-			if(ImGui::BeginMenu("File")) {
-				if(ImGui::MenuItem("Exit"))
+		if (ImGui::BeginMenuBar()) {
+			if (ImGui::BeginMenu("File")) {
+				// Shortcuts are handled in CheckShortcuts()
+				if (ImGui::MenuItem("Save", "Ctrl+S")) {
+					m_CurrentProject->Save();
+				}
+				if (ImGui::MenuItem("Exit")) {
 					Application::Get().Stop();
+				}
 
 				ImGui::EndMenu();
 			}
@@ -153,5 +155,11 @@ namespace RealEngine {
 
 	void EditorLayer::EndDockspace() {
 		ImGui::End();
+	}
+
+	void EditorLayer::CheckShortcuts() {
+		if (ImGui::Shortcut(ImGuiKey_S | ImGuiMod_Ctrl, ImGuiInputFlags_RouteGlobal)) {
+			m_CurrentProject->Save();
+		}
 	}
 }
