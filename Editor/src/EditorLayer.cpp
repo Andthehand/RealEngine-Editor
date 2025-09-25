@@ -19,7 +19,6 @@ namespace RealEngine {
 		m_Framebuffer = CreateRef<Framebuffer>(spec);
 		m_EditorCamera.SetViewportSize((float)spec.Width, (float)spec.Height);
 
-
 		m_CurrentProject = CreateRef<Project>("ExampleProject/ExampleProject.reproj");
 		m_ActiveScene = m_CurrentProject->GetCurrentScene();
 
@@ -31,6 +30,16 @@ namespace RealEngine {
 
 	void EditorLayer::OnUpdate(const float deltaTime) {
 		RE_PROFILE_FUNCTION();
+
+		// Resize the camera and framebuffer if the viewport size has changed
+		// Static because we only need a reference once
+		static const FramebufferSpecification& spec = m_Framebuffer->GetSpecification();
+		if(m_ViewportSize.x > 0.0f && m_ViewportSize.y > 0.0f && // zero sized framebuffer is invalid
+			(spec.Width != m_ViewportSize.x || spec.Height != m_ViewportSize.y)) {
+
+			m_Framebuffer->Resize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
+			m_EditorCamera.SetViewportSize(m_ViewportSize.x, m_ViewportSize.y);
+		}
 
 		m_Framebuffer->Bind();
 		RenderCommands::Clear();
