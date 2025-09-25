@@ -18,6 +18,7 @@ include_directories(Editor PRIVATE
 target_link_libraries(Editor RealEngine)
 
 file(COPY assets DESTINATION "${CMAKE_BINARY_DIR}/Editor")
+file(COPY ExampleProject DESTINATION "${CMAKE_BINARY_DIR}/Editor")
 
 if(BUILD_DOCS)
 	add_subdirectory(docs)
