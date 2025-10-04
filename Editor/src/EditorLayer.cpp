@@ -19,13 +19,14 @@ namespace RealEngine {
 		m_Framebuffer = CreateRef<Framebuffer>(spec);
 		m_EditorCamera.SetViewportSize((float)spec.Width, (float)spec.Height);
 
-		m_CurrentProject = CreateRef<Project>("ExampleProject/ExampleProject.reproj");
-		m_ActiveScene = m_CurrentProject->GetCurrentScene();
-
-		m_SceneHierarchyPanel = SceneHierarchyPanel(m_ActiveScene);
+		Project::Initialize("ExampleProject/ExampleProject.reproj");
+		m_ActiveScene = Project::GetCurrentScene();
+		m_FileExplorerPanel.SetCurrentDirectory(Project::GetAssetsPath());
 	}
 
 	void EditorLayer::OnDetach() {
+		RE_PROFILE_FUNCTION();
+		Project::Shutdown();
 	}
 
 	void EditorLayer::OnUpdate(const float deltaTime) {
@@ -68,7 +69,7 @@ namespace RealEngine {
 			if (ImGui::BeginMenu("File")) {
 				// Shortcuts are handled in CheckShortcuts()
 				if (ImGui::MenuItem("Save", "Ctrl+S")) {
-					m_CurrentProject->Save();
+					Project::Save();
 				}
 				if (ImGui::MenuItem("Exit")) {
 					Application::Get().Stop();
@@ -168,7 +169,7 @@ namespace RealEngine {
 
 	void EditorLayer::CheckShortcuts() {
 		if (ImGui::Shortcut(ImGuiKey_S | ImGuiMod_Ctrl, ImGuiInputFlags_RouteGlobal)) {
-			m_CurrentProject->Save();
+			Project::Save();
 		}
 	}
 }

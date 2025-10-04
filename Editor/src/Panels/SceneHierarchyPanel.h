@@ -7,14 +7,12 @@ namespace RealEngine {
 	class SceneHierarchyPanel : public Panel {
 	public:
 		SceneHierarchyPanel() = default;
-		SceneHierarchyPanel(Ref<Scene> scene);
+		~SceneHierarchyPanel() = default;
 
 		void DisplayAllEntities();
 
 		void OnImGui() override;
 	private:
-		Ref<Scene> m_ActiveScene;
-
 		Entity m_SelectedEntity;
 	};
 }

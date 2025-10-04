@@ -6,8 +6,7 @@
 
 namespace RealEngine {
 
-	FileExplorerPanel::FileExplorerPanel()
-		: m_CurrentDirectory(std::filesystem::current_path()) {
+	FileExplorerPanel::FileExplorerPanel() {
 		RE_PROFILE_FUNCTION();
 
 		m_FolderIcon = Texture2D::Create("assets/icons/FileExplorerPanel/folder.png");
@@ -33,14 +32,16 @@ namespace RealEngine {
 	// ---------------- Helper Sections ---------------- //
 
 	void FileExplorerPanel::DrawNavigationBar() {
-		if (ImGui::Button("<-")) {
-			m_CurrentDirectory = m_CurrentDirectory.parent_path();
+		if (m_CurrentDirectory != Project::GetProjectPath()) {
+			if (ImGui::Button("<-")) {
+				m_CurrentDirectory = m_CurrentDirectory.parent_path();
+			}
 		}
 	}
 
 	int FileExplorerPanel::CalculateColumnCount() const {
 		float panelWidth = ImGui::GetContentRegionAvail().x;
-		float padding = ImGui::GetStyle().CellPadding.x;
+		float padding = ImGui::GetStyle().CellPadding.x * 2;
 		int columnCount = static_cast<int>(panelWidth / (FILE_ICON_SIZE + padding));
 
 		return columnCount < 1 ? 1 : columnCount;
@@ -48,10 +49,7 @@ namespace RealEngine {
 
 	bool FileExplorerPanel::BeginFileTable(int columnCount) {
 		if (ImGui::BeginTable("##FileExplorerTable", columnCount,
-			ImGuiTableFlags_SizingStretchSame | ImGuiTableFlags_PadOuterX | ImGuiTableFlags_NoBordersInBody)) {
-
-			for (int c = 0; c < columnCount; c++)
-				ImGui::TableSetupColumn(nullptr, ImGuiTableColumnFlags_WidthStretch);
+			ImGuiTableFlags_SizingStretchSame | ImGuiTableFlags_PadOuterX | ImGuiTableFlags_NoClip)) {
 
 			ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
 			return true;

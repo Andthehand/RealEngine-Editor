@@ -38,7 +38,6 @@ namespace RealEngine {
 		};
 
 		SceneState m_SceneState = SceneState::Edit;
-		Ref<Project> m_CurrentProject;
 		Ref<Scene> m_ActiveScene;
 
 		/// Framebuffer used to render the scene in the editor viewport.

@@ -5,14 +5,12 @@
 #include <imgui.h>
 
 namespace RealEngine {
-	SceneHierarchyPanel::SceneHierarchyPanel(Ref<Scene> scene)
-		: m_ActiveScene(scene) { }
-
 	void SceneHierarchyPanel::DisplayAllEntities() {
 		RE_PROFILE_FUNCTION();
 		constexpr ImGuiTreeNodeFlags base_flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth;
 
-		for (auto& [id, entity] : m_ActiveScene->m_EntityMap) {
+		Ref<Scene> activeScene = Project::GetCurrentScene();
+		for (auto& [id, entity] : activeScene->m_EntityMap) {
 			TagComponent& tagComponent = entity.GetComponent<TagComponent>();
 
 			ImGuiTreeNodeFlags node_flags = base_flags;
@@ -42,7 +40,7 @@ namespace RealEngine {
 						RE_RAISE_EVENT(event);
 					}
 
-					m_ActiveScene->DestroyEntity(entity);
+					activeScene->DestroyEntity(entity);
 
 					// Deleting the entity invalidates the iterator
 					// This doesn't cause issues because we re-draw the panel every frame
@@ -69,7 +67,7 @@ namespace RealEngine {
 			// Right-click on blank space
 			if (ImGui::BeginPopupContextWindow(0, ImGuiPopupFlags_MouseButtonRight | ImGuiPopupFlags_NoOpenOverItems)) {
 				if (ImGui::Selectable("Add Entity")) {
-					m_ActiveScene->CreateEntity("New Entity");
+					Project::GetCurrentScene()->CreateEntity("New Entity");
 				}
 
 				ImGui::EndPopup();

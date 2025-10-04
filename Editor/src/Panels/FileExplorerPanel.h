@@ -17,6 +17,8 @@ namespace RealEngine {
 		FileExplorerPanel();
 		~FileExplorerPanel() = default;
 
+		void SetCurrentDirectory(const std::filesystem::path& path) { m_CurrentDirectory = path; }
+
 		virtual void OnImGui() override;
 	private:
 		// Rendering steps broken out from OnImGui for clarity & testability
