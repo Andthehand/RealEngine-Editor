@@ -17,12 +17,14 @@ namespace RealEngine {
 		RE_PROFILE_FUNCTION();
 
 		if (ImGui::Begin("File Explorer")) {
-			DrawNavigationBar();
+			if (Project::IsFullyInitialized()) {
+				DrawNavigationBar();
 
-			const int columnCount = CalculateColumnCount();
-			if (BeginFileTable(columnCount)) {
-				DrawDirectoryEntries(columnCount);
-				EndFileTable();
+				const int columnCount = CalculateColumnCount();
+				if (BeginFileTable(columnCount)) {
+					DrawDirectoryEntries(columnCount);
+					EndFileTable();
+				}
 			}
 		}
 

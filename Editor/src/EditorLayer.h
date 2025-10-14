@@ -31,6 +31,12 @@ namespace RealEngine {
 		void EndDockspace();
 
 		void CheckShortcuts();
+
+		// Shortcut/menu actions
+		void NewProject();
+		void OpenProject();
+		void SaveProject();
+
 	private:
 		enum class SceneState {
 			Edit = 0,
@@ -38,7 +44,6 @@ namespace RealEngine {
 		};
 
 		SceneState m_SceneState = SceneState::Edit;
-		Ref<Scene> m_ActiveScene;
 
 		/// Framebuffer used to render the scene in the editor viewport.
 		static constexpr float MIN_DOCKED_WINDOW_SIZE = 250.0f;

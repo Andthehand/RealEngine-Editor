@@ -16,17 +16,15 @@ namespace RealEngine {
 		spec.Height = 720;
 		spec.Attachments = { FramebufferTextureFormat::RGBA8 };
 
-		m_Framebuffer = CreateRef<Framebuffer>(spec);
+		m_Framebuffer = Framebuffer::Create(spec);
 		m_EditorCamera.SetViewportSize((float)spec.Width, (float)spec.Height);
 
-		Project::Initialize("ExampleProject/ExampleProject.reproj");
-		m_ActiveScene = Project::GetCurrentScene();
+		Project::CreateNewProject();
 		m_FileExplorerPanel.SetCurrentDirectory(Project::GetAssetsPath());
 	}
 
 	void EditorLayer::OnDetach() {
 		RE_PROFILE_FUNCTION();
-		Project::Shutdown();
 	}
 
 	void EditorLayer::OnUpdate(const float deltaTime) {
@@ -49,10 +47,10 @@ namespace RealEngine {
 			case SceneState::Edit:
 				m_EditorCamera.OnUpdate(deltaTime);
 
-				m_ActiveScene->OnUpdateEditor(deltaTime, m_EditorCamera);
+				Project::GetCurrentScene()->OnUpdateEditor(deltaTime, m_EditorCamera);
 				break;
 			case SceneState::Play:
-				m_ActiveScene->OnUpdateRuntime(deltaTime);
+				Project::GetCurrentScene()->OnUpdateRuntime(deltaTime);
 				break;
 		}
 
@@ -68,8 +66,14 @@ namespace RealEngine {
 		if (ImGui::BeginMenuBar()) {
 			if (ImGui::BeginMenu("File")) {
 				// Shortcuts are handled in CheckShortcuts()
+				if (ImGui::MenuItem("New", "Ctrl+N")) {
+					NewProject();
+				}
+				if (ImGui::MenuItem("Open", "Ctrl+O")) {
+					OpenProject();
+				}
 				if (ImGui::MenuItem("Save", "Ctrl+S")) {
-					Project::Save();
+					SaveProject();
 				}
 				if (ImGui::MenuItem("Exit")) {
 					Application::Get().Stop();
@@ -168,8 +172,32 @@ namespace RealEngine {
 	}
 
 	void EditorLayer::CheckShortcuts() {
-		if (ImGui::Shortcut(ImGuiKey_S | ImGuiMod_Ctrl, ImGuiInputFlags_RouteGlobal)) {
-			Project::Save();
+		if (ImGui::Shortcut(ImGuiKey_N | ImGuiMod_Ctrl, ImGuiInputFlags_RouteGlobal)) {
+			NewProject();
 		}
+		if (ImGui::Shortcut(ImGuiKey_O | ImGuiMod_Ctrl, ImGuiInputFlags_RouteGlobal)) {
+			OpenProject();
+		}
+		if (ImGui::Shortcut(ImGuiKey_S | ImGuiMod_Ctrl, ImGuiInputFlags_RouteGlobal)) {
+			SaveProject();
+		}
+	}
+
+	void EditorLayer::NewProject() {
+		Project::CreateNewProject();
+		m_FileExplorerPanel.SetCurrentDirectory(Project::GetProjectPath());
+	}
+
+	void EditorLayer::OpenProject() {
+		std::filesystem::path projectFile = FileDialogs::OpenFile("Real Engine Project (*.reproj)\0*.reproj\0");
+		
+		if (!projectFile.empty()) {
+			Project::Load(projectFile);
+			m_FileExplorerPanel.SetCurrentDirectory(Project::GetProjectPath());
+		}
+	}
+
+	void EditorLayer::SaveProject() {
+		Project::Save();
 	}
 }
