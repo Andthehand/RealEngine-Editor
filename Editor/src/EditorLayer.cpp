@@ -66,15 +66,30 @@ namespace RealEngine {
 		if (ImGui::BeginMenuBar()) {
 			if (ImGui::BeginMenu("File")) {
 				// Shortcuts are handled in CheckShortcuts()
-				if (ImGui::MenuItem("New", "Ctrl+N")) {
+				if (ImGui::MenuItem("New Scene", "Ctrl+N")) {
+					NewScene();
+				}
+				if (ImGui::MenuItem("Open Scene", "Ctrl+O")) {
+					OpenScene();
+				}
+				if (ImGui::MenuItem("Save Scene", "Ctrl+S")) {
+					SaveScene();
+				}
+
+				ImGui::Separator();
+
+				if (ImGui::MenuItem("New Project", "Ctrl+Shift+N")) {
 					NewProject();
 				}
-				if (ImGui::MenuItem("Open", "Ctrl+O")) {
+				if (ImGui::MenuItem("Open Project", "Ctrl+Shift+O")) {
 					OpenProject();
 				}
-				if (ImGui::MenuItem("Save", "Ctrl+S")) {
+				if (ImGui::MenuItem("Save Project", "Ctrl+Shift+S")) {
 					SaveProject();
 				}
+
+				ImGui::Separator();
+
 				if (ImGui::MenuItem("Exit")) {
 					Application::Get().Stop();
 				}
@@ -173,14 +188,65 @@ namespace RealEngine {
 
 	void EditorLayer::CheckShortcuts() {
 		if (ImGui::Shortcut(ImGuiKey_N | ImGuiMod_Ctrl, ImGuiInputFlags_RouteGlobal)) {
-			NewProject();
+			NewScene();
 		}
 		if (ImGui::Shortcut(ImGuiKey_O | ImGuiMod_Ctrl, ImGuiInputFlags_RouteGlobal)) {
-			OpenProject();
+			OpenScene();
 		}
 		if (ImGui::Shortcut(ImGuiKey_S | ImGuiMod_Ctrl, ImGuiInputFlags_RouteGlobal)) {
+			SaveScene();
+		}
+
+		if (ImGui::Shortcut(ImGuiKey_N | ImGuiMod_Ctrl | ImGuiMod_Shift, ImGuiInputFlags_RouteGlobal)) {
+			NewProject();
+		}
+		if (ImGui::Shortcut(ImGuiKey_O | ImGuiMod_Ctrl | ImGuiMod_Shift, ImGuiInputFlags_RouteGlobal)) {
+			OpenProject();
+		}
+		if (ImGui::Shortcut(ImGuiKey_S | ImGuiMod_Ctrl | ImGuiMod_Shift, ImGuiInputFlags_RouteGlobal)) {
 			SaveProject();
 		}
+	}
+
+	void EditorLayer::NewScene() {
+		Project::GetCurrentScene()->Save();
+		Project::SetCurrentScene(CreateRef<Scene>());
+	}
+
+	void EditorLayer::OpenScene() {
+		if (!Project::IsFullyInitialized()) {
+			RE_CORE_WARN("Cannot open a scene when no project is loaded!");
+			return;
+		}
+
+		std::filesystem::path sceneFile = FileDialogs::OpenFile("Real Engine Scene (*.rescene)\0*.rescene\0");
+		
+		if (!sceneFile.empty()) {
+			Project::GetCurrentScene()->Save();
+			Project::SetCurrentScene(CreateRef<Scene>(sceneFile));
+		} else {
+			RE_CORE_WARN("Scene open was canceled or failed!");
+		}
+	}
+
+	void EditorLayer::SaveScene() {
+		if (!Project::IsFullyInitialized()) {
+			RE_CORE_WARN("Cannot save a scene when no project is loaded!");
+			return;
+		}
+
+		if (Project::GetCurrentScene()->GetFilePath().empty()) {
+			std::filesystem::path sceneFile = FileDialogs::SaveFile("Real Engine Scene (*.rescene)\0*.rescene\0");
+			if (sceneFile.empty()) {
+				RE_CORE_WARN("Scene save was canceled or failed!");
+				return;
+			}
+
+			Project::GetCurrentScene()->SetFilePath(sceneFile);
+		}
+
+
+		Project::Save();
 	}
 
 	void EditorLayer::NewProject() {

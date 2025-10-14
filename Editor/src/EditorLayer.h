@@ -33,6 +33,10 @@ namespace RealEngine {
 		void CheckShortcuts();
 
 		// Shortcut/menu actions
+		void NewScene();
+		void OpenScene();
+		void SaveScene();
+
 		void NewProject();
 		void OpenProject();
 		void SaveProject();
