@@ -5,6 +5,7 @@
 #include "Panels/PropertiesPanel.h"
 #include "Panels/SceneHierarchyPanel.h"
 #include "Panels/StatusPanel.h"
+#include "Panels/LoggerPanel.h"
 
 #include <glm/glm.hpp>
 
@@ -63,6 +64,8 @@ namespace RealEngine {
 
 		/// Scene hierarchy panel for managing entities in the current scene.
 		SceneHierarchyPanel m_SceneHierarchyPanel;
+
+		LoggerPanel m_LoggerPanel;
 
 		StatusPanel m_StatusPanel;
 	};
