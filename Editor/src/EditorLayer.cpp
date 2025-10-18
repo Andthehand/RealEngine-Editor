@@ -21,23 +21,6 @@ namespace RealEngine {
 
 		Project::CreateNewProject();
 		m_FileExplorerPanel.SetCurrentDirectory(Project::GetAssetsPath());
-
-		RE_CORE_TRACE("Trace");
-		RE_CORE_INFO("Info");
-		RE_CORE_WARN("Warn");
-		RE_CORE_ERROR("Error");
-		RE_CORE_CRITICAL("Critical");
-
-		RE_TRACE("Trace");
-		RE_INFO("Info");
-		RE_WARN("Warn");
-		RE_ERROR("Error");
-		RE_CRITICAL("Critical");
-
-		GLint samples = 0, sampleBuffers = 0;
-		glGetIntegerv(GL_SAMPLES, &samples);
-		glGetIntegerv(GL_SAMPLE_BUFFERS, &sampleBuffers);
-		RE_CORE_CRITICAL("GL_SAMPLE_BUFFERS={0} GL_SAMPLES={1}\n", sampleBuffers, samples);
 	}
 
 	void EditorLayer::OnDetach() {

@@ -40,70 +40,107 @@ namespace RealEngine {
 		m_IconInfo = Texture2D::Create("assets/icons/LoggerPanel/info.png", 4);
 		m_IconWarning = Texture2D::Create("assets/icons/LoggerPanel/warn.png", 4);
 		m_IconError = Texture2D::Create("assets/icons/LoggerPanel/error.png", 4);
+		m_IconCritical = Texture2D::Create("assets/icons/LoggerPanel/critical.png", 4);
 	}
 
-	void LoggerPanel::OnImGui() {
-		RE_PROFILE_FUNCTION();
+    void LoggerPanel::OnImGui() {
+        RE_PROFILE_FUNCTION();
 
-		if (ImGui::Begin("Logger")) {
-			if (ImGui::BeginChild("ScrollingRegion", ImVec2(0, 0), ImGuiChildFlags_NavFlattened, ImGuiWindowFlags_HorizontalScrollbar)) {
-				ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(4, 1));
-				
-				const auto& logQueue = ImGuiLogSink::GetQueue();
+        // Window padding zero to use full area
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{ 0.0f, 0.0f });
+        if (ImGui::Begin("Logger", nullptr, ImGuiWindowFlags_MenuBar)) {
+            const auto& logQueue = ImGuiLogSink::GetQueue();
 
-				static ImGuiSelectionBasicStorage selection;
-				ImGuiMultiSelectFlags flags = ImGuiMultiSelectFlags_ClearOnEscape | ImGuiMultiSelectFlags_BoxSelect1d;
-				ImGuiMultiSelectIO* ms_io = ImGui::BeginMultiSelect(flags, selection.Size, logQueue.Count());
-				selection.ApplyRequests(ms_io);
+            // -------- Menu bar --------
+            if (ImGui::BeginMenuBar()) {
+                const float initialRegionAvailable = ImGui::GetContentRegionAvail().x;
 
+                if (ImGui::MenuItem("Clear")) {
+                    ImGuiLogSink::GetQueue().Clear();
+                }
 
-				ImGuiListClipper clipper;
-				clipper.Begin(static_cast<int>(logQueue.Count()));
-				if (ms_io->RangeSrcItem != -1)
-					clipper.IncludeItemByIndex((int)ms_io->RangeSrcItem); // Ensure RangeSrc item is not clipped.
+                if (ImGui::BeginMenu("Options")) {
+                    ImGui::MenuItem("Auto-scroll", nullptr, &m_AutoScroll);
+                    ImGui::EndMenu();
+                }
 
-				static float iconSizeMultiplier = 1.0f;
-				ImGui::DragFloat("Icon Size", &iconSizeMultiplier, 0.01f, 0.1f, 5.0f);
+                const std::string countLabel = std::to_string(logQueue.Size()) + " / " + std::to_string(logQueue.Count());
+                const float xOffset = ImGui::CalcTextSize(countLabel.c_str()).x;
+                ImGui::SetCursorPosX(initialRegionAvailable - xOffset);
+                ImGui::TextUnformatted(countLabel.c_str());
 
-				while (clipper.Step()) {
-					for (int i = clipper.DisplayStart; i < clipper.DisplayEnd; ++i) {
-						const auto& it = logQueue.begin() + i;
+                ImGui::EndMenuBar();
+            }
 
-						ImGui::PushID(i);
+            // -------- Scrolling table --------
+            constexpr ImGuiTableFlags tableFlags =
+                ImGuiTableFlags_ScrollX | ImGuiTableFlags_ScrollY |
+                ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_RowBg | ImGuiTableFlags_BordersOuter;
 
-						ImGui::PushStyleColor(ImGuiCol_Text, Utils::GetLogColor(it->Severity));
-						ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
-						ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, { 0, 0 });
-						bool item_is_selected = selection.Contains((ImGuiID)i);
-						ImGui::SetNextItemSelectionUserData(i);
+            if (ImGui::BeginTable("ScrollingRegion", 2, tableFlags)) {
+                static ImGuiSelectionBasicStorage selection;
+                const ImGuiMultiSelectFlags msFlags = ImGuiMultiSelectFlags_ClearOnEscape | ImGuiMultiSelectFlags_BoxSelect1d;
+                ImGuiMultiSelectIO* ms_io = ImGui::BeginMultiSelect(msFlags, selection.Size, logQueue.Count());
+                selection.ApplyRequests(ms_io);
 
+                // Use clipper for large queues
+                ImGuiListClipper clipper;
+                clipper.Begin(static_cast<int>(logQueue.Count()));
+                if (ms_io->RangeSrcItem != -1) {
+                    clipper.IncludeItemByIndex(static_cast<int>(ms_io->RangeSrcItem)); // Ensure RangeSrc item is not clipped.
+                }
 
-						float textHeight = ImGui::CalcTextSize(it->Text.c_str(), NULL, true).y;
-						ImGui::Image(GetLogIcon(it->Severity), {textHeight * iconSizeMultiplier, textHeight * iconSizeMultiplier}, {0.0f, 1.0f}, {1.0f, 0.0f});
-						
-						ImGui::SameLine();
-						ImGui::Selectable(it->Text.c_str(), item_is_selected, 0, ImVec2(0, textHeight));
-						ImGui::PopStyleColor(2);
-						ImGui::PopStyleVar();
+                ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2{ 0.0f, 0.0f });
+                while (clipper.Step()) {
+                    for (int i = clipper.DisplayStart; i < clipper.DisplayEnd; ++i) {
+                        const auto& entry = logQueue.begin() + i; // random-access by index
 
-						ImGui::PopID();
-					}
-				}
+                        ImGui::PushID(i);
+                        ImGui::TableNextRow();
+                        ImGui::TableNextColumn();
 
-				ms_io = ImGui::EndMultiSelect();
-				selection.ApplyRequests(ms_io);
+                        // Color & icon
+                        ImGui::PushStyleColor(ImGuiCol_Text, Utils::GetLogColor(entry->Severity));
+                        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.0f, 0.0f, 0.0f, 0.0f });
 
-				//Auto-scroll when new log messages are added
-				if (ImGui::GetScrollY() >= ImGui::GetScrollMaxY())
-					ImGui::SetScrollHereY(1.0f);
+                        const bool item_is_selected = selection.Contains(static_cast<ImGuiID>(i));
+                        ImGui::SetNextItemSelectionUserData(i);
 
-				ImGui::PopStyleVar();
-			}
-			ImGui::EndChild();
-		}
+                        const float textHeight = ImGui::CalcTextSize(entry->Text.c_str(), nullptr, true).y;
+                        ImGui::Image(reinterpret_cast<void*>(static_cast<intptr_t>(GetLogIcon(entry->Severity))),
+                            ImVec2{ textHeight, textHeight },
+                            ImVec2{ 0.0f, 1.0f },
+                            ImVec2{ 1.0f, 0.0f });
 
-		ImGui::End();
-	}
+                        ImGui::SameLine();
+                        ImGui::TableNextColumn();
+                        ImGui::Selectable(entry->Text.c_str(),
+                            item_is_selected,
+                            ImGuiSelectableFlags_SpanAllColumns | ImGuiSelectableFlags_AllowOverlap,
+                            ImVec2{ 0.0f, textHeight });
+
+                        ImGui::PopStyleColor(2); // ImGuiCol_Text ImGuiCol_Button
+                        ImGui::PopID();
+                    }
+                }
+                ImGui::PopStyleVar(); // ImGuiStyleVar_FramePadding
+
+                // For clipping
+                ms_io = ImGui::EndMultiSelect();
+                selection.ApplyRequests(ms_io);
+
+                // Auto-scroll when at bottom and new messages appear
+                if (m_AutoScroll && ImGui::GetScrollY() >= ImGui::GetScrollMaxY()) {
+                    ImGui::SetScrollHereY(1.0f);
+                }
+
+                ImGui::EndTable();
+            }
+        }
+
+        ImGui::End();
+        ImGui::PopStyleVar(); // ImGuiStyleVar_WindowPadding
+    }
 
 	uint32_t LoggerPanel::GetLogIcon(quill::LogLevel level) {
 		switch (level) {
@@ -117,8 +154,9 @@ namespace RealEngine {
 			case quill::LogLevel::Warning:
 				return m_IconWarning->GetRendererID();
 			case quill::LogLevel::Error:
-			case quill::LogLevel::Critical:
 				return m_IconError->GetRendererID();
+			case quill::LogLevel::Critical:
+				return m_IconCritical->GetRendererID();
 			case quill::LogLevel::Backtrace:
 			case quill::LogLevel::None:
 			default:
