@@ -25,6 +25,9 @@ namespace RealEngine {
 
 	void EditorLayer::OnDetach() {
 		RE_PROFILE_FUNCTION();
+
+		// Cleans up the Scene data held in the project
+		Project::ClearProject();
 	}
 
 	void EditorLayer::OnUpdate(const float deltaTime) {

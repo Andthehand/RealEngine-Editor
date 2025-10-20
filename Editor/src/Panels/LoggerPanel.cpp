@@ -64,7 +64,7 @@ namespace RealEngine {
                     ImGui::EndMenu();
                 }
 
-                const std::string countLabel = std::to_string(logQueue.Size()) + " / " + std::to_string(logQueue.Count());
+                const std::string countLabel = std::to_string(logQueue.Count()) + " / " + std::to_string(logQueue.Size());
                 const float xOffset = ImGui::CalcTextSize(countLabel.c_str()).x;
                 ImGui::SetCursorPosX(initialRegionAvailable - xOffset);
                 ImGui::TextUnformatted(countLabel.c_str());
