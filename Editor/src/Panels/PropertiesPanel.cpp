@@ -8,7 +8,7 @@
 namespace RealEngine {	
 	namespace Utils {
 		bool DrawVec3Control(const std::string& label, glm::vec3* values, float labelWidth = 110.0f) {
-			ImGui::Text(label.c_str());
+			ImGui::TextUnformatted(label.c_str());
 
 			ImGui::SameLine();
 			ImGui::SetCursorPosX(labelWidth);
@@ -18,7 +18,7 @@ namespace RealEngine {
 		}
 
 		void DrawVec4Control(const std::string& label, glm::vec4* values, float labelWidth = 110.0f) {
-			ImGui::Text(label.c_str());
+			ImGui::TextUnformatted(label.c_str());
 
 			ImGui::SameLine();
 			ImGui::SetCursorPosX(labelWidth);
@@ -28,7 +28,7 @@ namespace RealEngine {
 		}
 
 		void DrawColorEdit4(const std::string& label, glm::vec4* color, float labelWidth = 110.0f) {
-			ImGui::Text(label.c_str());
+			ImGui::TextUnformatted(label.c_str());
 			
 			ImGui::SameLine();
 			ImGui::SetCursorPosX(labelWidth);
@@ -106,7 +106,7 @@ namespace RealEngine {
 	}
 
 	void PropertiesPanel::ShowFolderProperties() {
-		ImGui::Text(("Selected Folder: " + m_SelectedFolder.string()).c_str());
+		ImGui::TextUnformatted(("Selected Folder: " + m_SelectedFolder.string()).c_str());
 	}
 
 	void PropertiesPanel::ShowEntityProperties() {
@@ -153,7 +153,7 @@ namespace RealEngine {
 				ShowEntityProperties();
 				break;
 			case CurrentView::None:
-				ImGui::Text("No selection");
+				ImGui::TextUnformatted("No selection");
 				break;
 			}
 		}
