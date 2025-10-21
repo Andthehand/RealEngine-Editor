@@ -4,6 +4,7 @@
 
 #include <imgui.h>
 #include <misc/cpp/imgui_stdlib.h>
+#include <imgui_internal.h>
 
 namespace RealEngine {	
 	namespace Utils {
@@ -146,15 +147,15 @@ namespace RealEngine {
 
 		if (ImGui::Begin("Properties")) {
 			switch (m_CurrentView) {
-			case CurrentView::FolderView:
-				ShowFolderProperties();
-				break;
-			case CurrentView::EntityView:
-				ShowEntityProperties();
-				break;
-			case CurrentView::None:
-				ImGui::TextUnformatted("No selection");
-				break;
+				case CurrentView::FolderView:
+					ShowFolderProperties();
+					break;
+				case CurrentView::EntityView:
+					ShowEntityProperties();
+					break;
+				case CurrentView::None:
+					ImGui::TextUnformatted("No selection");
+					break;
 			}
 		}
 
