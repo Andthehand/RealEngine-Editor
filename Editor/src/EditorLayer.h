@@ -56,6 +56,7 @@ namespace RealEngine {
 		Ref<Framebuffer> m_Framebuffer;
 		glm::vec2 m_ViewportSize = { 0.0f, 0.0f };
 		EditorCamera m_EditorCamera;
+		bool m_ViewportFocused = false;
 
 		/// File explorer panel for browsing assets and directories.
 		FileExplorerPanel m_FileExplorerPanel;

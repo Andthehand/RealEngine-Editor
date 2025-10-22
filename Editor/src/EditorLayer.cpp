@@ -134,17 +134,19 @@ namespace RealEngine {
 
 		//ImGui Viewport Window/Panel
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
-		ImGui::Begin("Viewport");
-		auto viewportMinRegion = ImGui::GetWindowContentRegionMin();
-		auto viewportMaxRegion = ImGui::GetWindowContentRegionMax();
-		auto viewportOffset = ImGui::GetWindowPos();
+		if (ImGui::Begin("Viewport")) {
+			m_ViewportFocused = ImGui::IsWindowFocused();
 
-		ImVec2 viewpoerPanelSize = ImGui::GetContentRegionAvail();
-		m_ViewportSize = { viewpoerPanelSize.x, viewpoerPanelSize.y };
+			auto viewportMinRegion = ImGui::GetWindowContentRegionMin();
+			auto viewportMaxRegion = ImGui::GetWindowContentRegionMax();
+			auto viewportOffset = ImGui::GetWindowPos();
 
-		uint64_t textureID = m_Framebuffer->GetAttachmentRendererID();
-		ImGui::Image(reinterpret_cast<void*>(textureID), ImVec2{ m_ViewportSize.x, m_ViewportSize.y }, ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
+			ImVec2 viewpoerPanelSize = ImGui::GetContentRegionAvail();
+			m_ViewportSize = { viewpoerPanelSize.x, viewpoerPanelSize.y };
 
+			uint64_t textureID = m_Framebuffer->GetAttachmentRendererID();
+			ImGui::Image(reinterpret_cast<void*>(textureID), ImVec2{ m_ViewportSize.x, m_ViewportSize.y }, ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
+		}
 		ImGui::End();
 		ImGui::PopStyleVar();
 
@@ -156,7 +158,8 @@ namespace RealEngine {
 	void EditorLayer::OnEvent(Event& event) {
 		RE_PROFILE_FUNCTION();
 
-		m_EditorCamera.OnEvent(event);
+		if(m_ViewportFocused)
+			m_EditorCamera.OnEvent(event);
 		m_PropertiesPanel.OnEvent(event);
 	}
 
