@@ -62,6 +62,17 @@ namespace RealEngine {
 	template<>
 	void PropertiesPanel::DisplayComponent<SpriteRendererComponent>(SpriteRendererComponent* component) {
 		Utils::DrawColorEdit4("Color", &component->Color);
+		if (ImGui::Button("Texture")) {
+			const char* filter = "Image Files (*.png;*.jpg;*.jpeg)\0*.png;*.jpg;*.jpeg;*.bmp;*.tga\0All Files (*.*)\0*.*\0";
+			std::filesystem::path texturePath = FileDialogs::OpenFile(filter);
+
+			if (!texturePath.empty()) {
+				AssetHandle handle = Project::GetAssetManager().ImportAssetIfNeeded(texturePath);
+				if (handle) {
+					component->Texture = Project::GetAssetManager().GetAsset<Texture2D>(handle);
+				}
+			}
+		}
 	}
 
 	template<typename... Components>

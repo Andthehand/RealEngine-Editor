@@ -8,3 +8,4 @@ Entities:
       Scale: [1,1,1]
     SpriteRendererComponent:
       Color: [1,0,1,1]
+      Texture: 678660402
