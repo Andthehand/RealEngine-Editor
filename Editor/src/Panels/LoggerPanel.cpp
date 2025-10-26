@@ -2,6 +2,8 @@
 
 #include "RealEngine.h"
 
+#include "RealEngine/Asset/TextureImporter.h"
+
 #include <imgui.h>
 
 namespace RealEngine {
@@ -37,10 +39,10 @@ namespace RealEngine {
 	LoggerPanel::LoggerPanel() {
 		RE_PROFILE_FUNCTION();
 
-		m_IconInfo = Texture2D::Create("assets/icons/LoggerPanel/info.png", 4);
-		m_IconWarning = Texture2D::Create("assets/icons/LoggerPanel/warn.png", 4);
-		m_IconError = Texture2D::Create("assets/icons/LoggerPanel/error.png", 4);
-		m_IconCritical = Texture2D::Create("assets/icons/LoggerPanel/critical.png", 4);
+		m_IconInfo = TextureImporter::LoadTexture2D("assets/icons/LoggerPanel/info.png", 4);
+        m_IconWarning = TextureImporter::LoadTexture2D("assets/icons/LoggerPanel/warn.png", 4);
+        m_IconError = TextureImporter::LoadTexture2D("assets/icons/LoggerPanel/error.png", 4);
+        m_IconCritical = TextureImporter::LoadTexture2D("assets/icons/LoggerPanel/critical.png", 4);
 	}
 
     void LoggerPanel::OnImGui() {

@@ -1,6 +1,7 @@
 #include "FileExplorerPanel.h"
 
 #include "Events/PanelEvents.h"
+#include "RealEngine/Asset/TextureImporter.h"
 
 #include <imgui.h>
 
@@ -9,8 +10,8 @@ namespace RealEngine {
 	FileExplorerPanel::FileExplorerPanel() {
 		RE_PROFILE_FUNCTION();
 
-		m_FolderIcon = Texture2D::Create("assets/icons/FileExplorerPanel/folder.png");
-		m_FileIcon   = Texture2D::Create("assets/icons/FileExplorerPanel/document.png");
+		m_FolderIcon = TextureImporter::LoadTexture2D("assets/icons/FileExplorerPanel/folder.png");
+		m_FileIcon   = TextureImporter::LoadTexture2D("assets/icons/FileExplorerPanel/document.png");
 	}
 
 	void FileExplorerPanel::OnImGui() {
