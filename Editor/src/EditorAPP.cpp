@@ -17,8 +17,6 @@ namespace RealEngine {
 	Application* CreateApplication(const ApplicationCommandLineArgs& args) {
 		RE_PROFILE_FUNCTION();
 
-		RE_CORE_WARN("Current Working Directory: {0}", std::filesystem::current_path());
-
 		ApplicationSpecification specification = { "Editor", args };
 		return new Editor(specification);
 	}

@@ -1,4 +1,6 @@
 Assets:
   - Handle: 678660402
-    FilePath: 'C:\Users\sixde\Documents\RealEngine-Editor\Editor\ExampleProject\assets\Checkerboard.png'
+    FilePath: Checkerboard.png
     Type: 1
+    CustomMetadata:
+      MipLevels: 1

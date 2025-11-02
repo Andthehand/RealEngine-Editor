@@ -29,14 +29,14 @@ namespace RealEngine {
 		template<typename... Components>
 		void DisplayAddComponentEntries(ComponentList::ComponentGroup<Components...>);
 
-		void ShowFolderProperties();
+		void ShowFileProperties();
 		void ShowEntityProperties();
 	private:
-		std::filesystem::path m_SelectedFolder = "";
+		std::filesystem::path m_SelectedFile = "";
 		Entity m_SelectedEntity;
 
 		enum class CurrentView {
-			FolderView,
+			FileView,
 			EntityView,
 			None
 		};

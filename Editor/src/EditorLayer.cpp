@@ -1,5 +1,7 @@
 #include "EditorLayer.h"
 
+#include "Events/PanelEvents.h"
+
 #include <imgui.h>
 
 namespace RealEngine {
@@ -164,6 +166,8 @@ namespace RealEngine {
 	}
 
 	void EditorLayer::StartDockspace() {
+		RE_PROFILE_FUNCTION();
+
 		static bool s_DockspaceOpen = true;
 		static ImGuiWindowFlags window_flags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking
 			| ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize
@@ -196,6 +200,8 @@ namespace RealEngine {
 	}
 
 	void EditorLayer::CheckShortcuts() {
+		RE_PROFILE_FUNCTION();
+
 		if (ImGui::Shortcut(ImGuiKey_N | ImGuiMod_Ctrl, ImGuiInputFlags_RouteGlobal)) {
 			NewScene();
 		}
@@ -218,11 +224,19 @@ namespace RealEngine {
 	}
 
 	void EditorLayer::NewScene() {
+		RE_PROFILE_FUNCTION();
+
 		Project::GetCurrentScene()->Save();
 		Project::SetCurrentScene(CreateRef<Scene>());
+
+		// Notify panels that the selected entity has been deselected/deleted
+		PanelEntityDeselectEvent panelEvent;
+		RE_RAISE_EVENT(panelEvent);
 	}
 
 	void EditorLayer::OpenScene() {
+		RE_PROFILE_FUNCTION();
+
 		if (!Project::IsFullyInitialized()) {
 			RE_CORE_WARN("Cannot open a scene when no project is loaded!");
 			return;
@@ -233,12 +247,18 @@ namespace RealEngine {
 		if (!sceneFile.empty()) {
 			Project::GetCurrentScene()->Save();
 			Project::SetCurrentScene(CreateRef<Scene>(sceneFile));
+
+			// Notify panels that the selected entity has been deselected/deleted
+			PanelEntityDeselectEvent panelEvent;
+			RE_RAISE_EVENT(panelEvent);
 		} else {
 			RE_CORE_WARN("Scene open was canceled or failed!");
 		}
 	}
 
 	void EditorLayer::SaveScene() {
+		RE_PROFILE_FUNCTION();
+
 		if (!Project::IsFullyInitialized()) {
 			RE_CORE_WARN("Cannot save a scene when no project is loaded!");
 			return;
@@ -259,20 +279,34 @@ namespace RealEngine {
 	}
 
 	void EditorLayer::NewProject() {
+		RE_PROFILE_FUNCTION();
+
 		Project::CreateNewProject();
 		m_FileExplorerPanel.SetCurrentDirectory(Project::GetProjectPath());
+
+		// Notify panels that the selected entity has been deselected/deleted
+		PanelEntityDeselectEvent panelEvent;
+		RE_RAISE_EVENT(panelEvent);
 	}
 
 	void EditorLayer::OpenProject() {
+		RE_PROFILE_FUNCTION();
+
 		std::filesystem::path projectFile = FileDialogs::OpenFile("Real Engine Project (*.reproj)\0*.reproj\0");
 		
 		if (!projectFile.empty()) {
 			Project::Load(projectFile);
 			m_FileExplorerPanel.SetCurrentDirectory(Project::GetProjectPath());
+
+			// Notify panels that the selected entity has been deselected/deleted
+			PanelEntityDeselectEvent panelEvent;
+			RE_RAISE_EVENT(panelEvent);
 		}
 	}
 
 	void EditorLayer::SaveProject() {
+		RE_PROFILE_FUNCTION();
+
 		Project::Save();
 	}
 }

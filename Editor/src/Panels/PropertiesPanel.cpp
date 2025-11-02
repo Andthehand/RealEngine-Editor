@@ -117,8 +117,25 @@ namespace RealEngine {
 		}()), ...);
 	}
 
-	void PropertiesPanel::ShowFolderProperties() {
-		ImGui::TextUnformatted(("Selected Folder: " + m_SelectedFolder.string()).c_str());
+	void PropertiesPanel::ShowFileProperties() {
+		AssetHandle handle(m_SelectedFile);
+		bool isAsset = Project::GetAssetManager().IsAssetValid(handle);
+
+		ImGui::TextUnformatted("File Properties");
+		ImGui::Separator();
+		ImGui::TextWrapped("Path: %s", m_SelectedFile.string().c_str());
+		if (isAsset) {
+			AssetMetadata* metadata = Project::GetAssetManager().GetAssetMetadata(handle);
+			if (Texture2DMetadata* texture2DMetadata = std::any_cast<Texture2DMetadata>(&metadata->CustomMetadata)) {
+				int mipLevels = texture2DMetadata->MipLevels;
+				
+				if (ImGui::DragInt("Mip Levels", &mipLevels, 1, 1, 16)) {
+					texture2DMetadata->MipLevels = mipLevels;
+				}
+			}
+		} else {
+			ImGui::TextUnformatted("Not an imported asset.");
+		}
 	}
 
 	void PropertiesPanel::ShowEntityProperties() {
@@ -158,8 +175,8 @@ namespace RealEngine {
 
 		if (ImGui::Begin("Properties")) {
 			switch (m_CurrentView) {
-				case CurrentView::FolderView:
-					ShowFolderProperties();
+				case CurrentView::FileView:
+					ShowFileProperties();
 					break;
 				case CurrentView::EntityView:
 					ShowEntityProperties();
@@ -177,9 +194,9 @@ namespace RealEngine {
 		RE_PROFILE_FUNCTION();
 
 		EventDispatcher dispatcher(event);
-		dispatcher.Dispatch<PanelFolderSelectEvent>([this](PanelFolderSelectEvent& e) {
-			m_SelectedFolder = e.GetPath();
-			m_CurrentView = CurrentView::FolderView;
+		dispatcher.Dispatch<PanelFileSelectEvent>([this](PanelFileSelectEvent& e) {
+			m_SelectedFile = e.GetPath();
+			m_CurrentView = CurrentView::FileView;
 			return true;
 		});
 

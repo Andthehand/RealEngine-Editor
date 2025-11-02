@@ -3,9 +3,9 @@
 #include <filesystem>
 
 namespace RealEngine {
-	class PanelFolderSelectEvent : public Event {
+	class PanelFileSelectEvent : public Event {
 	public:
-		PanelFolderSelectEvent(const std::filesystem::path& path)
+		PanelFileSelectEvent(const std::filesystem::path& path)
 			: m_Path(path) {
 		}
 
@@ -13,7 +13,7 @@ namespace RealEngine {
 
 		virtual std::string ToString() const override {
 			std::stringstream ss;
-			ss << "PanelFolderSelectEvent: " << m_Path.string();
+			ss << "PanelFileSelectEvent: " << m_Path.string();
 			return ss.str();
 		}
 

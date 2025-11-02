@@ -1,0 +1,11 @@
+Entities:
+  Wow Crazy:
+    IDComponent:
+      ID: 355488278567739596
+    TransformComponent:
+      Position: [0,0,0]
+      Rotation: [0,0,0,1]
+      Scale: [1,1,1]
+    SpriteRendererComponent:
+      Color: [1,0,0.88938046,1]
+      Texture: 678660402
