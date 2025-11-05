@@ -37,6 +37,52 @@ namespace RealEngine {
 			ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x);
 			ImGui::ColorEdit4(("##" + label).c_str(), &color->x);
 		}
+
+		int OpenGLFilterToArrayIndex(TextureFilterMode filter) {
+			switch(filter) {
+				case TextureFilterMode::NEAREST: return 0;
+				case TextureFilterMode::BILINEAR: return 1;
+				case TextureFilterMode::TRILINEAR: return 2;
+				default: 
+					RE_CORE_ASSERT(false, "Unknown TextureFilterMode: {0}", static_cast<GLenum>(filter));
+					return 0; // Default to Nearest if unknown
+			}
+		}
+
+		TextureFilterMode ArrayIndexToOpenGLFilter(int index) {
+			switch(index) {
+				case 0: return TextureFilterMode::NEAREST;
+				case 1: return TextureFilterMode::BILINEAR;
+				case 2: return TextureFilterMode::TRILINEAR;
+				default: 
+					RE_CORE_ASSERT(false, "Unknown TextureFilterMode index: {0}", index);
+					return TextureFilterMode::NEAREST; // Default to Nearest if unknown
+			}
+		}
+
+		TextureWrapMode ArrayIndexToOpenGLWrap(int index) {
+			switch(index) {
+				case 0: return TextureWrapMode::REPEAT;
+				case 1: return TextureWrapMode::MIRRORED_REPEAT;
+				case 2: return TextureWrapMode::CLAMP_TO_EDGE;
+				case 3: return TextureWrapMode::CLAMP_TO_BORDER;
+				default: 
+					RE_CORE_ASSERT(false, "Unknown TextureWrapMode index: {0}", index);
+					return TextureWrapMode::REPEAT; // Default to Repeat if unknown
+			}
+		}
+
+		int OpenGLWrapToArrayIndex(TextureWrapMode wrap) {
+			switch(wrap) {
+				case TextureWrapMode::REPEAT: return 0;
+				case TextureWrapMode::MIRRORED_REPEAT: return 1;
+				case TextureWrapMode::CLAMP_TO_EDGE: return 2;
+				case TextureWrapMode::CLAMP_TO_BORDER: return 3;
+				default: 
+					RE_CORE_ASSERT(false, "Unknown TextureWrapMode: {0}", static_cast<GLenum>(wrap));
+					return 0; // Default to Repeat if unknown
+			}
+		}
 	}
 
 	template<typename T>
@@ -68,6 +114,7 @@ namespace RealEngine {
 
 			if (!texturePath.empty()) {
 				AssetHandle handle = Project::GetAssetManager().ImportAssetIfNeeded(texturePath);
+
 				if (handle) {
 					component->Texture = Project::GetAssetManager().GetAsset<Texture2D>(handle);
 				}
@@ -121,16 +168,28 @@ namespace RealEngine {
 		AssetHandle handle(m_SelectedFile);
 		bool isAsset = Project::GetAssetManager().IsAssetValid(handle);
 
-		ImGui::TextUnformatted("File Properties");
+		ImGui::Text("File Properties: %s", m_SelectedFile.filename().string().c_str());
 		ImGui::Separator();
-		ImGui::TextWrapped("Path: %s", m_SelectedFile.string().c_str());
 		if (isAsset) {
 			AssetMetadata* metadata = Project::GetAssetManager().GetAssetMetadata(handle);
 			if (Texture2DMetadata* texture2DMetadata = std::any_cast<Texture2DMetadata>(&metadata->CustomMetadata)) {
 				int mipLevels = texture2DMetadata->MipLevels;
-				
 				if (ImGui::DragInt("Mip Levels", &mipLevels, 1, 1, 16)) {
 					texture2DMetadata->MipLevels = mipLevels;
+				}
+
+				// Filter Mode
+				const char* textureFilterOptions[] = { "Nearest", "Bilinear", "Trilinear"};
+				int currentFilterIndex = Utils::OpenGLFilterToArrayIndex(texture2DMetadata->FilterMode);
+				if (ImGui::Combo("Filter Mode", &currentFilterIndex, textureFilterOptions, IM_ARRAYSIZE(textureFilterOptions))) {
+					texture2DMetadata->FilterMode = Utils::ArrayIndexToOpenGLFilter(currentFilterIndex);
+				}
+
+				// Wrap Mode
+				const char* textureWrapOptions[] = { "Repeat", "Mirrored Repeat", "Clamp to Edge", "Clamp to Border" };
+				int currentWrapIndex = Utils::OpenGLWrapToArrayIndex(texture2DMetadata->WrapMode);
+				if (ImGui::Combo("Wrap Mode", &currentWrapIndex, textureWrapOptions, IM_ARRAYSIZE(textureWrapOptions))) {
+					texture2DMetadata->WrapMode = Utils::ArrayIndexToOpenGLWrap(currentWrapIndex);
 				}
 			}
 		} else {
@@ -195,8 +254,10 @@ namespace RealEngine {
 
 		EventDispatcher dispatcher(event);
 		dispatcher.Dispatch<PanelFileSelectEvent>([this](PanelFileSelectEvent& e) {
-			m_SelectedFile = e.GetPath();
-			m_CurrentView = CurrentView::FileView;
+			if (std::filesystem::is_regular_file(e.GetPath())) {
+				m_SelectedFile = e.GetPath();
+				m_CurrentView = CurrentView::FileView;
+			}
 			return true;
 		});
 
