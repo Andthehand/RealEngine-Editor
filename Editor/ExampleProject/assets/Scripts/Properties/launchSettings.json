@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Example.Managed": {
+      "commandName": "Project",
+      "nativeDebugging": true
+    }
+  }
+}

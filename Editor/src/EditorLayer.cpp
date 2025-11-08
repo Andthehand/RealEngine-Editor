@@ -301,6 +301,7 @@ namespace RealEngine {
 			// Notify panels that the selected entity has been deselected/deleted
 			PanelEntityDeselectEvent panelEvent;
 			RE_RAISE_EVENT(panelEvent);
+			ScriptEngine::Init();
 		}
 	}
 
