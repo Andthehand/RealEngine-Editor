@@ -4,8 +4,6 @@ workspace "CoralManaged"
     targetdir "%{wks.location}/Build/%{cfg.buildcfg}"
 	objdir "%{wks.location}/Intermediates/%{cfg.buildcfg}"
 
-include "../../../../RealEngine/vendor/coral/Coral.Managed"
-
 project "Example.Managed"
     language "C#"
     dotnetframework "net9.0"
@@ -25,4 +23,4 @@ project "Example.Managed"
         "Source/**.cs"
     }
     
-    links { "Coral.Managed" }
+    links { "RealEngine" }

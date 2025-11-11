@@ -9,6 +9,9 @@
 *.user
 *.userosscache
 *.sln.docstates
+*.csproj
+*.vcxproj
+*.sln
 
 # Doxygen Files
 /Editor/docs/doxygen
