@@ -15,6 +15,17 @@ While **RealEngine-V2** is the underlying engine library, RealEngine-Editor offe
 
 ---
 
+# Debugging
+
+If you want to debug C++ and C# at the same time you have to do the following steps:
+1. Open the RealEngine-Editor folder in Visual Studio.
+2. Launch RealEngine-Editor without a debugger (Ctrl+F5).
+3. Attach the debugger to the running process (Debug > Attach to Process...).
+4. Change the code type to both Managed(.Net Core, .Net 5+) and Native Code.
+5. Select the Editor.exe process and click Attach.
+
+---
+
 ## About
 
 RealEngine-Editor is designed to separate the engine from the development tools. This allows developers to:

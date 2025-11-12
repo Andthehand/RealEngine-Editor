@@ -33,8 +33,8 @@ namespace Example.Managed {
 
 		public ExampleClass(int someValue)
 		{
-			Console.WriteLine($"Example({someValue})");
-		}
+			RealEngine.InternalCalls.Log("ExampleClass Constructor");
+        }
 
 		public static void StaticMethod(float value)
 		{

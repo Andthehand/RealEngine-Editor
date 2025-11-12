@@ -5,7 +5,12 @@ namespace RealEngine
     public static class InternalCalls
     {
         //Logging
-        internal static unsafe delegate*<NativeString, void> NativeLog;
+        private static unsafe delegate*<NativeString, void> NativeLog;
         //Logging
+
+        public static void Log(string message)
+        {
+            unsafe { NativeLog(message); }
+        }
     }
 }
