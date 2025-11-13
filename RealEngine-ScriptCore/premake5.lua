@@ -9,8 +9,8 @@ project "RealEngine"
     kind "SharedLib"
     clr "Unsafe"
 
-	targetdir ("../Build/%{cfg.buildcfg}")
-	objdir ("../Intermediates/%{cfg.buildcfg}")
+	targetdir ("./Build/%{cfg.buildcfg}")
+	objdir ("./Intermediates/%{cfg.buildcfg}")
 
 	links { "Coral.Managed" }
 
