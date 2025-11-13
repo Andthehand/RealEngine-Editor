@@ -41,6 +41,8 @@ namespace RealEngine {
 			None
 		};
 
+		std::vector<std::string> m_ValidScriptClasses;
+
 		CurrentView m_CurrentView = CurrentView::None;
 	};
 }

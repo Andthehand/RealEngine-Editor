@@ -1,16 +1,13 @@
 using Coral.Managed.Interop;
 
+#pragma warning disable 0649
 namespace RealEngine
 {
     public static class InternalCalls
     {
         //Logging
-        private static unsafe delegate*<NativeString, void> NativeLog;
+        internal static unsafe delegate*<LogLevel, NativeString, void> NativeLog;
         //Logging
-
-        public static void Log(string message)
-        {
-            unsafe { NativeLog(message); }
-        }
     }
 }
+#pragma warning restore 0649

@@ -7,7 +7,7 @@ option(BUILD_DOCS "Build Doxygen docs" OFF)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
-add_executable(Editor "src/EditorAPP.cpp" "src/EditorLayer.h" "src/EditorLayer.cpp" "src/Panels/FileExplorerPanel.cpp" "src/Panels/PropertiesPanel.h" "src/Panels/PropertiesPanel.cpp" "src/Events/PanelEvents.h" "src/Panels/Panel.h" "src/Panels/SceneHierarchyPanel.cpp"   "src/Panels/StatusPanel.h" "src/Panels/StatusPanel.cpp" "src/Panels/LoggerPanel.h" "src/Panels/LoggerPanel.cpp")
+add_executable(Editor "src/EditorAPP.cpp" "src/EditorLayer.h" "src/EditorLayer.cpp" "src/Panels/FileExplorerPanel.cpp" "src/Panels/PropertiesPanel.h" "src/Panels/PropertiesPanel.cpp" "src/Events/PanelEvents.h" "src/Panels/Panel.h" "src/Panels/SceneHierarchyPanel.cpp"   "src/Panels/StatusPanel.h" "src/Panels/StatusPanel.cpp" "src/Panels/LoggerPanel.h" "src/Panels/LoggerPanel.cpp" "src/Events/GeneralEvents.h")
 
 include_directories(Editor PRIVATE
   ${CMAKE_SOURCE_DIR}/RealEngine/src

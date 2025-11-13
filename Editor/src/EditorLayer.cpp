@@ -1,6 +1,7 @@
 #include "EditorLayer.h"
 
 #include "Events/PanelEvents.h"
+#include "Events/GeneralEvents.h"
 
 #include <imgui.h>
 
@@ -287,6 +288,8 @@ namespace RealEngine {
 		// Notify panels that the selected entity has been deselected/deleted
 		PanelEntityDeselectEvent panelEvent;
 		RE_RAISE_EVENT(panelEvent);
+		ProjectChangeEvent projectEvent;
+		RE_RAISE_EVENT(projectEvent);
 	}
 
 	void EditorLayer::OpenProject() {
@@ -301,7 +304,8 @@ namespace RealEngine {
 			// Notify panels that the selected entity has been deselected/deleted
 			PanelEntityDeselectEvent panelEvent;
 			RE_RAISE_EVENT(panelEvent);
-			ScriptEngine::Init();
+			ProjectChangeEvent projectEvent;
+			RE_RAISE_EVENT(projectEvent);
 		}
 	}
 

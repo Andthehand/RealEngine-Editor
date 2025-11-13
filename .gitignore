@@ -13,6 +13,9 @@
 *.vcxproj
 *.sln
 
+# Mono Auto Generated Files
+/Editor/ExampleProject/assets/Scripts/Build
+
 # Doxygen Files
 /Editor/docs/doxygen
 

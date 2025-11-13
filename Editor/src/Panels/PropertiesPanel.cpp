@@ -1,6 +1,7 @@
 #include "PropertiesPanel.h"
 
 #include "Events/PanelEvents.h"
+#include "Events/GeneralEvents.h"
 
 #include <imgui.h>
 #include <misc/cpp/imgui_stdlib.h>
@@ -83,6 +84,15 @@ namespace RealEngine {
 					return 0; // Default to Repeat if unknown
 			}
 		}
+
+		// Utility function to get substring after the last '.'
+		const char* GetStringAfterLastDot(const std::string_view input) {
+			size_t pos = input.rfind('.');
+			if (pos == std::string::npos || pos + 1 >= input.size())
+				return input.data();
+
+			return input.data() + pos + 1;
+		}
 	}
 
 	template<typename T>
@@ -92,6 +102,8 @@ namespace RealEngine {
 
 	template<>
 	void PropertiesPanel::DisplayComponent<TransformComponent>(TransformComponent* component) {
+		RE_PROFILE_FUNCTION();
+
 		glm::vec3 position = component->GetPosition();
 		if (Utils::DrawVec3Control("Position", &position))
 			component->SetPosition(position);
@@ -107,6 +119,8 @@ namespace RealEngine {
 
 	template<>
 	void PropertiesPanel::DisplayComponent<SpriteRendererComponent>(SpriteRendererComponent* component) {
+		RE_PROFILE_FUNCTION();
+
 		Utils::DrawColorEdit4("Color", &component->Color);
 		if (ImGui::Button("Texture")) {
 			const char* filter = "Image Files (*.png;*.jpg;*.jpeg)\0*.png;*.jpg;*.jpeg;*.bmp;*.tga\0All Files (*.*)\0*.*\0";
@@ -122,8 +136,34 @@ namespace RealEngine {
 		}
 	}
 
+	template<>
+	void PropertiesPanel::DisplayComponent<ScriptComponent>(ScriptComponent* component) {
+		RE_PROFILE_FUNCTION();
+
+		std::string selectedScript;
+		if(component->Instance.IsValid()) {
+			selectedScript = std::string(component->Instance.GetType().GetFullName());
+		}
+		else {
+			selectedScript = "None";
+		}
+
+		if(ImGui::BeginCombo("Scripts: ", Utils::GetStringAfterLastDot(selectedScript))) {
+			for (const std::string& scriptClass : m_ValidScriptClasses) {
+				if (ImGui::Selectable(Utils::GetStringAfterLastDot(scriptClass))) {
+					component->Instance = ScriptEngine::CreateObject(0, scriptClass);
+				}
+			}
+
+			ImGui::EndCombo();
+		}
+	}
+
+
 	template<typename... Components>
 	void PropertiesPanel::DisplayComponents(ComponentList::ComponentGroup<Components...>) {
+		RE_PROFILE_FUNCTION();
+
 		// Fold expression over comma operator to handle each component
 		(([this]() {
 			if(m_SelectedEntity.HasComponent<Components>() == false)
@@ -165,6 +205,8 @@ namespace RealEngine {
 	}
 
 	void PropertiesPanel::ShowFileProperties() {
+		RE_PROFILE_FUNCTION();
+
 		AssetHandle handle(m_SelectedFile);
 		bool isAsset = Project::GetAssetManager().IsAssetValid(handle);
 
@@ -198,6 +240,8 @@ namespace RealEngine {
 	}
 
 	void PropertiesPanel::ShowEntityProperties() {
+		RE_PROFILE_FUNCTION();
+
 		m_SelectedEntity.GetComponent<TagComponent>();
 		const char* addComponentBtnLabel = "+";
 
@@ -258,12 +302,16 @@ namespace RealEngine {
 				m_SelectedFile = e.GetPath();
 				m_CurrentView = CurrentView::FileView;
 			}
+
+			// Handled because this should be the only panel responding to this event
 			return true;
 		});
 
 		dispatcher.Dispatch<PanelEntitySelectEvent>([this](PanelEntitySelectEvent& e) {
 			m_SelectedEntity = e.GetEntity();
 			m_CurrentView = CurrentView::EntityView;
+
+			// Handled because this should be the only panel responding to this event
 			return true;
 		});
 
@@ -273,7 +321,14 @@ namespace RealEngine {
 			if(m_CurrentView == CurrentView::EntityView)
 				m_CurrentView = CurrentView::None;
 
+			// Handled because this should be the only panel responding to this event
 			return true;
+		});
+
+		dispatcher.Dispatch<ProjectChangeEvent>([this](ProjectChangeEvent& e) {
+			m_ValidScriptClasses = ScriptEngine::GetValidScriptClasses();
+
+			return false;
 		});
 	}
 }

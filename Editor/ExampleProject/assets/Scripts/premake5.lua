@@ -1,10 +1,11 @@
-workspace "CoralManaged"
+workspace "Managed"
     configurations { "Debug", "Release" }
+    startproject "ExampleProject"
 
-    targetdir "%{wks.location}/Build/%{cfg.buildcfg}"
+    targetdir "%{wks.location}/Build"
 	objdir "%{wks.location}/Intermediates/%{cfg.buildcfg}"
 
-project "Example.Managed"
+project "ExampleProject"
     language "C#"
     dotnetframework "net9.0"
     kind "SharedLib"

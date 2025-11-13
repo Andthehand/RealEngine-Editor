@@ -2,6 +2,8 @@ using Coral.Managed.Interop;
 
 using System;
 
+using RealEngine;
+
 namespace Example.Managed {
 
 	[AttributeUsage(AttributeTargets.Class)]
@@ -11,9 +13,8 @@ namespace Example.Managed {
 	}
 
 	[Custom(Value = -2500.0f)]
-	public class ExampleClass
+	public class ExampleClass : Entity
 	{
-
 		public struct MyVec3
 		{
 			public float X;
@@ -31,12 +32,21 @@ namespace Example.Managed {
 
 		private int myPrivateValue;
 
-		public ExampleClass(int someValue)
+		public ExampleClass()
 		{
-			RealEngine.InternalCalls.Log("ExampleClass Constructor");
+            Logger.Trace("ExampleClass Constructor");
+			Logger.Info("ExampleClass Constructor");
+			Logger.Warn("ExampleClass Constructor");
+			Logger.Error("ExampleClass Constructor");
+			Logger.Critical("ExampleClass Constructor");
         }
 
-		public static void StaticMethod(float value)
+		~ExampleClass()
+		{
+			Logger.Info("ExampleClass Destructor");
+        }
+
+        public static void StaticMethod(float value)
 		{
 			Console.WriteLine($"StaticMethod: {value}");
 		}
