@@ -13,36 +13,12 @@ namespace Example.Managed {
 	}
 
 	[Custom(Value = -2500.0f)]
-	public class ExampleClass : Entity
-	{
-		public struct MyVec3
-		{
-			public float X;
-			public float Y;
-			public float Z;
-		}
-
-		// NOTE(Emily): These are set from native code.
-#pragma warning disable 0649
-		internal static unsafe delegate*<MyVec3*, MyVec3*, void> VectorAddIcall;
-		internal static unsafe delegate*<NativeString, void> PrintStringIcall;
-		internal static unsafe delegate*<NativeArray<float>, void> NativeArrayIcall;
-		internal static unsafe delegate*<NativeArray<float>> ArrayReturnIcall;
-#pragma warning restore 0649
-
-		private int myPrivateValue;
-
-		public ExampleClass()
-		{
-            Logger.Trace("ExampleClass Constructor");
-			Logger.Info("ExampleClass Constructor");
-			Logger.Warn("ExampleClass Constructor");
-			Logger.Error("ExampleClass Constructor");
-			Logger.Critical("ExampleClass Constructor");
+	public class ExampleClass : Entity {
+		void OnCreate() {
+			Logger.Warn($"Entity Id is : {ID}");
         }
 
-		~ExampleClass()
-		{
+		~ExampleClass() {
 			Logger.Info("ExampleClass Destructor");
         }
 
@@ -50,49 +26,6 @@ namespace Example.Managed {
 		{
 			Console.WriteLine($"StaticMethod: {value}");
 		}
-
-		public void MemberMethod(MyVec3 vec3)
-		{
-			MyVec3 anotherVector = new()
-			{
-				X = 10,
-				Y = 20,
-				Z = 30
-			};
-
-			unsafe { VectorAddIcall(&vec3, &anotherVector); }
-
-			Console.WriteLine($"X: {vec3.X}, Y: {vec3.Y}, Z: {vec3.Z}");
-		}
-
-		public void StringDemo()
-		{
-			NativeString str = "Hello, World?";
-			unsafe { PrintStringIcall(str); }
-		}
-
-		public void ArrayDemo(float[] InArray)
-		{
-			NativeArray<float> arr = new(InArray);
-			unsafe { NativeArrayIcall(arr); }
-
-			unsafe
-			{
-				// We use "using" here so that nativeArr is automatically disposed of at
-				// the end of this scope
-				using var nativeArr = ArrayReturnIcall();
-
-				foreach (var v in nativeArr)
-					Console.WriteLine(v);
-			}
-		}
-
-		public int PublicProp
-		{
-			get => myPrivateValue;
-			set => myPrivateValue = value * 2;
-		}
-
 	}
 
 }
