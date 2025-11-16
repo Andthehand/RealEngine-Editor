@@ -1,7 +1,5 @@
-﻿namespace RealEngine
-{
-    public enum LogLevel
-    {
+﻿namespace RealEngine {
+    public enum LogLevel {
         Trace       = 0,
         Info        = 1,
         Warn        = 2,
@@ -9,10 +7,8 @@
         Critical    = 4
     }
 
-    public static class Logger
-    {
-        public static void Log(LogLevel level, string message)
-        {
+    public static class Logger {
+        public static void Log(LogLevel level, string message) {
             unsafe { InternalCalls.NativeLog(level, message); }
         }
 
