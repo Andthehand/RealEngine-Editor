@@ -58,16 +58,21 @@ namespace RealEngine {
 		EditorCamera m_EditorCamera;
 		bool m_ViewportFocused = false;
 
+		// This is used when in runtime to keep a copy of the "Real" Scene
+		Ref<Scene> m_SwapScene;
+
+		static constexpr float ICON_OFFSET_FROM_TOP = 10.0f;
+		static constexpr float ICON_SIZE = 25.0f;
+		Ref<Texture2D> m_PlayIcon;
+		Ref<Texture2D> m_PauseIcon;
+
 		/// File explorer panel for browsing assets and directories.
 		FileExplorerPanel m_FileExplorerPanel;
 		/// Properties panel for displaying and editing object properties.
 		PropertiesPanel m_PropertiesPanel;
-
 		/// Scene hierarchy panel for managing entities in the current scene.
 		SceneHierarchyPanel m_SceneHierarchyPanel;
-
 		LoggerPanel m_LoggerPanel;
-
 		StatusPanel m_StatusPanel;
 	};
 }

@@ -151,7 +151,7 @@ namespace RealEngine {
 		if(ImGui::BeginCombo("Scripts: ", Utils::GetStringAfterLastDot(selectedScript))) {
 			for (const std::string& scriptClass : m_ValidScriptClasses) {
 				if (ImGui::Selectable(Utils::GetStringAfterLastDot(scriptClass))) {
-					component->Instance = ScriptEngine::CreateObject(0, scriptClass);
+					component->Instance = ScriptEngine::CreateObject(100, scriptClass);
 				}
 			}
 
@@ -315,20 +315,23 @@ namespace RealEngine {
 			return true;
 		});
 
-		dispatcher.Dispatch<PanelEntityDeselectEvent>([this](PanelEntityDeselectEvent& e) {
-			m_SelectedEntity = {};
-
-			if(m_CurrentView == CurrentView::EntityView)
-				m_CurrentView = CurrentView::None;
-
-			// Handled because this should be the only panel responding to this event
-			return true;
-		});
+		dispatcher.Dispatch<SceneChangedEvent>(RE_BIND_EVENT_FN(PropertiesPanel::DeselectEntityEvent));
+		dispatcher.Dispatch<PanelEntityDeselectEvent>(RE_BIND_EVENT_FN(PropertiesPanel::DeselectEntityEvent));
 
 		dispatcher.Dispatch<ProjectChangeEvent>([this](ProjectChangeEvent& e) {
 			m_ValidScriptClasses = ScriptEngine::GetValidScriptClasses();
 
 			return false;
 		});
+	}
+
+	template<typename T>
+	bool PropertiesPanel::DeselectEntityEvent(T& e) {
+		m_SelectedEntity = {};
+
+		if (m_CurrentView == CurrentView::EntityView)
+			m_CurrentView = CurrentView::None;
+
+		return false;
 	}
 }

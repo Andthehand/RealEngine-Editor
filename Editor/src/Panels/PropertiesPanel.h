@@ -31,6 +31,9 @@ namespace RealEngine {
 
 		void ShowFileProperties();
 		void ShowEntityProperties();
+
+		template<typename T>
+		bool DeselectEntityEvent(T& e);
 	private:
 		std::filesystem::path m_SelectedFile = "";
 		Entity m_SelectedEntity;

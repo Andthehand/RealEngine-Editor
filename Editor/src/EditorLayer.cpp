@@ -3,7 +3,14 @@
 #include "Events/PanelEvents.h"
 #include "Events/GeneralEvents.h"
 
+#define IMGUI_DEFINE_MATH_OPERATORS
 #include <imgui.h>
+
+#define RE_RETURN_IF_SCENESTATE_PLAY() \
+	if (m_SceneState == SceneState::Play) { \
+		InfoDialog::WarnUser("Scene State Warning", "Cannot perform this action when in Play Mode"); \
+		return; \
+	}
 
 namespace RealEngine {
 	EditorLayer::EditorLayer()
@@ -24,6 +31,9 @@ namespace RealEngine {
 
 		Project::CreateNewProject();
 		m_FileExplorerPanel.SetCurrentDirectory(Project::GetAssetsPath());
+
+		m_PlayIcon = TextureImporter::LoadTexture2D("assets/icons/EditorLayer/play.png");
+		m_PauseIcon = TextureImporter::LoadTexture2D("assets/icons/EditorLayer/pause.png");
 	}
 
 	void EditorLayer::OnDetach() {
@@ -56,7 +66,10 @@ namespace RealEngine {
 				Project::GetCurrentScene()->OnUpdateEditor(deltaTime, m_EditorCamera);
 				break;
 			case SceneState::Play:
-				Project::GetCurrentScene()->OnUpdateRuntime(deltaTime);
+				//TODO: Remove this camera in runtime mode and use a camera from the scene
+				m_EditorCamera.OnUpdate(deltaTime);
+
+				Project::GetCurrentScene()->OnUpdateRuntime(deltaTime, m_EditorCamera);
 				break;
 		}
 
@@ -137,7 +150,7 @@ namespace RealEngine {
 
 		//ImGui Viewport Window/Panel
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
-		if (ImGui::Begin("Viewport")) {
+		if (ImGui::Begin("Viewport", nullptr, ImGuiWindowFlags_NoDecoration)) {
 			m_ViewportFocused = ImGui::IsWindowFocused();
 
 			auto viewportMinRegion = ImGui::GetWindowContentRegionMin();
@@ -149,6 +162,39 @@ namespace RealEngine {
 
 			uint64_t textureID = m_Framebuffer->GetAttachmentRendererID();
 			ImGui::Image(reinterpret_cast<void*>(textureID), ImVec2{ m_ViewportSize.x, m_ViewportSize.y }, ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
+
+			// Centered Play Button
+			float size = ICON_SIZE + ImGui::GetStyle().FramePadding.x * 2.0f;
+			float avail = ImGui::GetContentRegionAvail().x;
+
+			float off = (avail - size) * 0.5f;
+			if (off > 0.0f)
+				ImGui::SetCursorPos(ImVec2(ImGui::GetCursorPosX() + off, ICON_OFFSET_FROM_TOP));
+
+			ImTextureRef currentIcon = m_SceneState == SceneState::Edit ? m_PlayIcon->GetRendererID() : m_PauseIcon->GetRendererID();
+			if (ImGui::ImageButton("Icon", currentIcon, ImVec2(ICON_SIZE, ICON_SIZE))) {
+				// Switch to Play mode
+				switch (m_SceneState) {
+					case SceneState::Edit:
+						m_SceneState = SceneState::Play;
+
+						// Copy the scene so the runtime sceen doesn't screw with the editor scene
+						m_SwapScene = Project::GetCurrentScene();
+						Project::SetCurrentScene(Scene::Copy(m_SwapScene));
+						Project::GetCurrentScene()->OnRuntimeStart();
+						break;
+					case SceneState::Play:
+						m_SceneState = SceneState::Edit;
+						Project::GetCurrentScene()->OnRuntimeStop();
+
+						Project::SetCurrentScene(m_SwapScene);
+						m_SwapScene = nullptr;
+						break;
+					default:
+						RE_CORE_ASSERT(false, "Unknown scene state!");
+						break;
+				};
+			}
 		}
 		ImGui::End();
 		ImGui::PopStyleVar();
@@ -226,17 +272,15 @@ namespace RealEngine {
 
 	void EditorLayer::NewScene() {
 		RE_PROFILE_FUNCTION();
+		RE_RETURN_IF_SCENESTATE_PLAY();
 
 		Project::GetCurrentScene()->Save();
 		Project::SetCurrentScene(CreateRef<Scene>());
-
-		// Notify panels that the selected entity has been deselected/deleted
-		PanelEntityDeselectEvent panelEvent;
-		RE_RAISE_EVENT(panelEvent);
 	}
 
 	void EditorLayer::OpenScene() {
 		RE_PROFILE_FUNCTION();
+		RE_RETURN_IF_SCENESTATE_PLAY();
 
 		if (!Project::IsFullyInitialized()) {
 			RE_CORE_WARN("Cannot open a scene when no project is loaded!");
@@ -248,10 +292,6 @@ namespace RealEngine {
 		if (!sceneFile.empty()) {
 			Project::GetCurrentScene()->Save();
 			Project::SetCurrentScene(CreateRef<Scene>(sceneFile));
-
-			// Notify panels that the selected entity has been deselected/deleted
-			PanelEntityDeselectEvent panelEvent;
-			RE_RAISE_EVENT(panelEvent);
 		} else {
 			RE_CORE_WARN("Scene open was canceled or failed!");
 		}
@@ -259,6 +299,7 @@ namespace RealEngine {
 
 	void EditorLayer::SaveScene() {
 		RE_PROFILE_FUNCTION();
+		RE_RETURN_IF_SCENESTATE_PLAY();
 
 		if (!Project::IsFullyInitialized()) {
 			RE_CORE_WARN("Cannot save a scene when no project is loaded!");
@@ -281,19 +322,19 @@ namespace RealEngine {
 
 	void EditorLayer::NewProject() {
 		RE_PROFILE_FUNCTION();
+		RE_RETURN_IF_SCENESTATE_PLAY();
 
 		Project::CreateNewProject();
 		m_FileExplorerPanel.SetCurrentDirectory(Project::GetProjectPath());
 
 		// Notify panels that the selected entity has been deselected/deleted
-		PanelEntityDeselectEvent panelEvent;
-		RE_RAISE_EVENT(panelEvent);
 		ProjectChangeEvent projectEvent;
 		RE_RAISE_EVENT(projectEvent);
 	}
 
 	void EditorLayer::OpenProject() {
 		RE_PROFILE_FUNCTION();
+		RE_RETURN_IF_SCENESTATE_PLAY();
 
 		std::filesystem::path projectFile = FileDialogs::OpenFile("Real Engine Project (*.reproj)\0*.reproj\0");
 		
@@ -302,8 +343,6 @@ namespace RealEngine {
 			m_FileExplorerPanel.SetCurrentDirectory(Project::GetProjectPath());
 
 			// Notify panels that the selected entity has been deselected/deleted
-			PanelEntityDeselectEvent panelEvent;
-			RE_RAISE_EVENT(panelEvent);
 			ProjectChangeEvent projectEvent;
 			RE_RAISE_EVENT(projectEvent);
 		}
@@ -311,6 +350,7 @@ namespace RealEngine {
 
 	void EditorLayer::SaveProject() {
 		RE_PROFILE_FUNCTION();
+		RE_RETURN_IF_SCENESTATE_PLAY();
 
 		Project::Save();
 	}
