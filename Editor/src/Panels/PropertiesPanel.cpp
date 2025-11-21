@@ -151,7 +151,7 @@ namespace RealEngine {
 		if(ImGui::BeginCombo("Scripts: ", Utils::GetStringAfterLastDot(selectedScript))) {
 			for (const std::string& scriptClass : m_ValidScriptClasses) {
 				if (ImGui::Selectable(Utils::GetStringAfterLastDot(scriptClass))) {
-					component->Instance = ScriptEngine::CreateObject(100, scriptClass);
+					component->Instance = Project::GetScriptEngine()->CreateObject(100, scriptClass);
 				}
 			}
 
@@ -319,7 +319,7 @@ namespace RealEngine {
 		dispatcher.Dispatch<PanelEntityDeselectEvent>(RE_BIND_EVENT_FN(PropertiesPanel::DeselectEntityEvent));
 
 		dispatcher.Dispatch<ProjectChangeEvent>([this](ProjectChangeEvent& e) {
-			m_ValidScriptClasses = ScriptEngine::GetValidScriptClasses();
+			m_ValidScriptClasses = Project::GetScriptEngine()->GetValidScriptClasses();
 
 			return false;
 		});
