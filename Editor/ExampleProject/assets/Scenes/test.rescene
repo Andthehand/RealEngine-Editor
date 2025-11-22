@@ -10,4 +10,4 @@ Entities:
       Color: [1,0,0.88938046,1]
       Texture: 400310266
     ScriptComponent:
-      ClassName: Example.Managed.ExampleClass
+      ClassName: ExampleClass1
