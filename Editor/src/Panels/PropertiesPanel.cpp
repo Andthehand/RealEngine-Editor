@@ -140,18 +140,10 @@ namespace RealEngine {
 	void PropertiesPanel::DisplayComponent<ScriptComponent>(ScriptComponent* component) {
 		RE_PROFILE_FUNCTION();
 
-		std::string selectedScript;
-		if(component->Instance.IsValid()) {
-			selectedScript = std::string(component->Instance.GetType().GetFullName());
-		}
-		else {
-			selectedScript = "None";
-		}
-
-		if(ImGui::BeginCombo("Scripts: ", Utils::GetStringAfterLastDot(selectedScript))) {
+		if(ImGui::BeginCombo("Scripts: ", Utils::GetStringAfterLastDot(component->ClassName))) {
 			for (const std::string& scriptClass : m_ValidScriptClasses) {
 				if (ImGui::Selectable(Utils::GetStringAfterLastDot(scriptClass))) {
-					component->Instance = Project::GetScriptEngine()->CreateObject(100, scriptClass);
+					component->ClassName = scriptClass;
 				}
 			}
 
