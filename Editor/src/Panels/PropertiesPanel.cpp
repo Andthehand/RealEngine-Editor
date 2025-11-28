@@ -104,9 +104,9 @@ namespace RealEngine {
 	void PropertiesPanel::DisplayComponent<TransformComponent>(TransformComponent* component) {
 		RE_PROFILE_FUNCTION();
 
-		glm::vec3 position = component->GetPosition();
+		glm::vec3 position = component->GetTransation();
 		if (Utils::DrawVec3Control("Position", &position))
-			component->SetPosition(position);
+			component->SetTransation(position);
 
 		glm::vec3 eulerRotation = component->GetRotationEuler();
 		if (Utils::DrawVec3Control("Rotation", &eulerRotation))
