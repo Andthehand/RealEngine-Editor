@@ -7,7 +7,7 @@ workspace "Managed"
 
 project "ExampleProject"
     language "C#"
-    dotnetframework "net9.0"
+    dotnetframework "net10.0"
     kind "SharedLib"
     clr "Unsafe"
     

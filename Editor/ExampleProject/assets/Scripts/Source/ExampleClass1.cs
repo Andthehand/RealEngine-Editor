@@ -12,14 +12,10 @@ public sealed class CustomAttribute : Attribute
 public class ExampleClass1 : Entity {
 	void OnCreate() {
 		Logger.Warn($"ExampleClass Entity Id is : {ID}");
-        SpriteRendererComponent? spriteComponent = GetComponent<SpriteRendererComponent>();
-
-		if (spriteComponent != null) {
-			spriteComponent.Color = new Vector4(100.0f, 20.0f, 50.0f, 255.0f);
-            Logger.Warn($"ExampleClass has componnet : {spriteComponent.Color}");
-		}
-		else {
-			Logger.Warn("ExampleClass does not have TransformComponent");
+		unsafe {
+            var spriteComponent = GetComponent<SpriteRendererComponent>();
+			spriteComponent->Color = new Vector4(0f, 255f, 0f, 255f);
+			Logger.Warn($"ExampleClass has componnet : {spriteComponent->Color}");
         }
     }
 

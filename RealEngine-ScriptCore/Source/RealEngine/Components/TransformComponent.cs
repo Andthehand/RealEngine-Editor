@@ -1,47 +1,35 @@
-﻿
-
-using System.Numerics;
+﻿using System.Numerics;
 
 namespace RealEngine {
-    public class TransformComponent : Component {
+    public struct TransformComponent {
+        private Vector3 translation;
         public Vector3 Translation {
-            get {
-                unsafe {
-                    InternalCalls.TransformComponent_GetTranslation(Entity.ID, out Vector3 translation);
-                    return translation;
-                }
-            }
+            get => translation;
             set {
-                unsafe { InternalCalls.TransformComponent_SetTranslation(Entity.ID, ref value); }
+                translation = value;
+                dirty = true;
             }
         }
 
+        private Quaternion rotation;
         public Quaternion Rotation {
-            get {
-                unsafe {
-                    InternalCalls.TransformComponent_GetRotation(Entity.ID, out Quaternion rotation);
-                    return rotation;
-                }
-            }
+            get => rotation;
             set {
-                unsafe { InternalCalls.TransformComponent_SetRotation(Entity.ID, ref value); }
+                rotation = value;
+                dirty = true;
             }
         }
 
-        public Vector3 Scale
-        {
-            get
-            {
-                unsafe
-                {
-                    InternalCalls.TransformComponent_GetScale(Entity.ID, out Vector3 scale);
-                    return scale;
-                }
-            }
-            set
-            {
-                unsafe { InternalCalls.TransformComponent_SetScale(Entity.ID, ref value); }
+        private Vector3 scale;
+        public Vector3 Scale {
+            get => scale;
+            set {
+                scale = value;
+                dirty = true;
             }
         }
+
+        private bool dirty;
+        public Matrix4x4 cachedMatrix;
     }
 }

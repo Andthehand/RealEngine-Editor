@@ -5,7 +5,7 @@ project "RealEngine"
         kind "StaticLib"
     filter { "action:vs* or system:windows" }
 	language "C#"
-	dotnetframework "net9.0"
+	dotnetframework "net10.0"
     kind "SharedLib"
     clr "Unsafe"
 

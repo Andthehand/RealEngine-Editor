@@ -1,19 +1,16 @@
-﻿
-
-using System.Numerics;
+﻿using System.Numerics;
+using System.Runtime.InteropServices;
 
 namespace RealEngine {
-    public class SpriteRendererComponent : Component {
+    [StructLayout(LayoutKind.Sequential, Size = 8)]
+    public struct SpriteRendererComponent {
+        private Vector4 color;
         public Vector4 Color {
             get {
-                unsafe {
-                    InternalCalls.SpriteRendererComponent_GetColor(Entity.ID, out Vector4 color);
-                    return color * 255;
-                }
+                return color * 255f;
             }
             set {
-                Vector4 outColor = value / 255;
-                unsafe { InternalCalls.SpriteRendererComponent_SetColor(Entity.ID, ref outColor); }
+                color = value / 255f;
             }
         }
     }
