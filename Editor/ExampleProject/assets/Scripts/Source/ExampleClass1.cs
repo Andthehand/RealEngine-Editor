@@ -11,11 +11,9 @@ public sealed class CustomAttribute : Attribute
 [Custom(Value = -2500.0f)]
 public class ExampleClass1 : Entity {
 	void OnCreate() {
-		Logger.Warn($"ExampleClass Entity Id is : {ID}");
+        Logger.Warn($"ExampleClass Entity Id is : {ID}");
 		unsafe {
-            var spriteComponent = GetComponent<SpriteRendererComponent>();
-			spriteComponent->Color = new Vector4(0f, 255f, 0f, 255f);
-			Logger.Warn($"ExampleClass has componnet : {spriteComponent->Color}");
+			Entity clone = Instantiate(this);
         }
     }
 

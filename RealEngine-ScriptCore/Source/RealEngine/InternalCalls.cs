@@ -11,6 +11,9 @@ namespace RealEngine {
         //Entity
         internal static unsafe delegate*<ulong, ReflectionType, bool> Entity_HasComponent;
         internal static unsafe delegate*<ulong, ReflectionType, void*> Entity_GetComponent;
+        internal static unsafe delegate*<ulong, ReflectionType, void*> Entity_AddComponent;
+
+        internal static unsafe delegate*<ulong, ulong> Entity_Instantiate;
         //Entity
     }
 }

@@ -2,7 +2,6 @@
 using System;
 
 namespace RealEngine {
-    // TODO: Implement Entity class
     public class Entity {
         protected Entity() { ID = 0; }
 
@@ -18,5 +17,10 @@ namespace RealEngine {
         }
 
         public unsafe T* GetComponent<T>() => (T*)InternalCalls.Entity_GetComponent(ID, typeof(T));
+        public unsafe T* AddComponent<T>() => (T*)InternalCalls.Entity_AddComponent(ID, typeof(T));
+
+        public Entity Instantiate(Entity entity) {
+            unsafe { return new Entity(InternalCalls.Entity_Instantiate(entity.ID)); }
+        }
     }
 }
