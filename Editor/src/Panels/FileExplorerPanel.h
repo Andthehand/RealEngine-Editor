@@ -38,7 +38,7 @@ namespace RealEngine {
 		Ref<Texture2D> m_FileIcon;
 
 		bool m_ThumbnailsLoaded = false;
-		std::unordered_map<std::filesystem::path, Ref<Texture2D>> m_Thumbnails;
+		HashMap<std::filesystem::path, Ref<Texture2D>> m_Thumbnails;
 
 		static constexpr float FILE_ICON_SIZE = 96.0f;
 	};
