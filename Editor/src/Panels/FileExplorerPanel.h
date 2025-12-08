@@ -21,7 +21,7 @@ namespace RealEngine {
 
 		virtual void OnImGui() override;
 	private:
-		// Rendering steps broken out from OnImGui for clarity & testability
+		// Rendering steps broken out from OnImGui
 		void DrawNavigationBar();
 		int  CalculateColumnCount() const;
 		bool BeginFileTable(int columnCount);

@@ -1,13 +1,4 @@
 Entities:
-  New Entity:
-    IDComponent:
-      ID: 13109570281517897720
-    TransformComponent:
-      Position: [0,0,0]
-      Rotation: [0,0,0,1]
-      Scale: [1,1,1]
-    ScriptComponent:
-      ClassName: ExampleClass1
   Wow Crazy:
     IDComponent:
       ID: 355488278567739596
@@ -20,3 +11,10 @@ Entities:
       Texture: 400310266
     ScriptComponent:
       ClassName: ExampleClass1
+  New Entity:
+    IDComponent:
+      ID: 13109570281517897720
+    TransformComponent:
+      Position: [0,0,0]
+      Rotation: [0,0,0,1]
+      Scale: [1,1,1]
