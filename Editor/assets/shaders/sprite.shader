@@ -42,5 +42,11 @@ out vec4 FragColor;
 layout(binding = 0) uniform sampler2D u_Textures[32];
 
 void main() {
-    FragColor = vColor * texture(u_Textures[vTexIndex], vTexCoord);
+    vec4 textureColor = vColor;
+    textureColor *= texture(u_Textures[vTexIndex], vTexCoord);
+
+    if(textureColor.a < 0.1)
+        discard;
+
+    FragColor = textureColor;
 }
