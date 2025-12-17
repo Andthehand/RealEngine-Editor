@@ -44,7 +44,7 @@ namespace RealEngine {
 			None
 		};
 
-		std::vector<std::string> m_ValidScriptClasses;
+		HashMap<std::string, std::vector<ScriptField>> m_ScriptClassFieldMap;
 
 		CurrentView m_CurrentView = CurrentView::None;
 	};

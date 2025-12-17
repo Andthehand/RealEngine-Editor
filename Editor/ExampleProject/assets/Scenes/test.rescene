@@ -1,20 +1,43 @@
 Entities:
-  Wow Crazy:
+  Left Dot:
     IDComponent:
-      ID: 355488278567739596
+      ID: 2690849186560333564
     TransformComponent:
-      Position: [0,0,0]
+      Position: [-10,0,0]
       Rotation: [0,0,0,1]
       Scale: [1,1,1]
     SpriteRendererComponent:
-      Color: [1,0,0.88938046,1]
-      Texture: 400310266
-    ScriptComponent:
-      ClassName: ExampleClass1
-  New Entity:
+      Color: [1,1,1,1]
+      Texture: 1535619548
+  Right Dot:
+    IDComponent:
+      ID: 10633499418513603462
+    TransformComponent:
+      Position: [10,0,0]
+      Rotation: [0,0,0,1]
+      Scale: [1,1,1]
+    SpriteRendererComponent:
+      Color: [1,1,1,1]
+      Texture: 1535619548
+  Right Stick:
     IDComponent:
       ID: 13109570281517897720
     TransformComponent:
-      Position: [0,0,0]
+      Position: [10,0,0]
       Rotation: [0,0,0,1]
-      Scale: [1,1,1]
+      Scale: [10,10,1]
+    SpriteRendererComponent:
+      Color: [0,0,0,1]
+      Texture: 2148249563
+  Left Stick:
+    IDComponent:
+      ID: 355488278567739596
+    TransformComponent:
+      Position: [-10,0,0]
+      Rotation: [0,0,0,1]
+      Scale: [10,10,1]
+    SpriteRendererComponent:
+      Color: [0,0,0,1]
+      Texture: 2148249563
+    ScriptComponent:
+      ClassName: ExampleClass1

@@ -9,7 +9,7 @@ namespace RealEngine {
             ID = id;
         }
 
-        public readonly ulong ID;
+        protected readonly ulong ID;
 
         public bool HasComponent<T>() {
             Type componentType = typeof(T);

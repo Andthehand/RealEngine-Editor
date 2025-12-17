@@ -141,13 +141,135 @@ namespace RealEngine {
 		RE_PROFILE_FUNCTION();
 
 		if(ImGui::BeginCombo("Scripts: ", Utils::GetStringAfterLastDot(component->ClassName))) {
-			for (const std::string& scriptClass : m_ValidScriptClasses) {
-				if (ImGui::Selectable(Utils::GetStringAfterLastDot(scriptClass))) {
-					component->ClassName = scriptClass;
+			for (const auto& scriptClass : m_ScriptClassFieldMap) {
+				if (ImGui::Selectable(Utils::GetStringAfterLastDot(scriptClass.first))) {
+					component->ClassName = scriptClass.first;
 				}
 			}
 
 			ImGui::EndCombo();
+		}
+
+		// TODO: Remove this early return when scripting fields editing is implemented in runtime
+		if (true)
+			return;
+
+		std::vector<ScriptField>& fields = m_ScriptClassFieldMap[component->ClassName];
+		ScriptInstance* instance = component->Instance.get();
+		for (const auto& field : fields) {
+			switch (field.Type) {
+				case ScriptFieldType::Float: {
+					float floatValue = instance->GetFieldValue<float>(field.Name);
+					if (ImGui::DragFloat(field.Name.c_str(), &floatValue)) {
+						instance->SetFieldValue<float>(field.Name, floatValue);
+					}
+					break;
+				}
+				case ScriptFieldType::Double: {
+					double doubleValue = instance->GetFieldValue<double>(field.Name);
+					if (ImGui::DragScalar(field.Name.c_str(), ImGuiDataType_Double, &doubleValue)) {
+						instance->SetFieldValue<double>(field.Name, doubleValue);
+					}
+					break;
+				}
+				case ScriptFieldType::Bool: {
+					bool boolValue = instance->GetFieldValue<bool>(field.Name);
+					if (ImGui::Checkbox(field.Name.c_str(), &boolValue)) {
+						instance->SetFieldValue<bool>(field.Name, boolValue);
+					}
+					break;
+				}
+				case ScriptFieldType::String: {
+					std::string stringValue = instance->GetFieldValue<std::string>(field.Name);
+					if (ImGui::InputText(field.Name.c_str(), &stringValue)) {
+						instance->SetFieldValue<std::string>(field.Name, stringValue);
+					}
+					break;
+				}
+				case ScriptFieldType::Char: {
+					char charValue = instance->GetFieldValue<char>(field.Name);
+					if (ImGui::InputText(field.Name.c_str(), &charValue, 2)) {
+						instance->SetFieldValue<char>(field.Name, charValue);
+					}
+					break;
+				}
+				case ScriptFieldType::Byte: {
+					int8_t byteValue = instance->GetFieldValue<int8_t>(field.Name);
+					if (ImGui::DragScalar(field.Name.c_str(), ImGuiDataType_S8, &byteValue)) {
+						instance->SetFieldValue<int8_t>(field.Name, byteValue);
+					}
+					break;
+				}
+				case ScriptFieldType::Short: {
+					int16_t shortValue = instance->GetFieldValue<int16_t>(field.Name);
+					if (ImGui::DragScalar(field.Name.c_str(), ImGuiDataType_S16, &shortValue)) {
+						instance->SetFieldValue<int16_t>(field.Name, shortValue);
+					}
+					break;
+				}
+				case ScriptFieldType::Int: {
+					int32_t intValue = instance->GetFieldValue<int32_t>(field.Name);
+					if (ImGui::DragScalar(field.Name.c_str(), ImGuiDataType_S32, &intValue)) {
+						instance->SetFieldValue<int32_t>(field.Name, intValue);
+					}
+					break;
+				}
+				case ScriptFieldType::Long: {
+					int64_t longValue = instance->GetFieldValue<int64_t>(field.Name);
+					if (ImGui::DragScalar(field.Name.c_str(), ImGuiDataType_S64, &longValue)) {
+						instance->SetFieldValue<int64_t>(field.Name, longValue);
+					}
+					break;
+				}
+				case ScriptFieldType::UByte: {
+					uint8_t ubyteValue = instance->GetFieldValue<uint8_t>(field.Name);
+					if (ImGui::DragScalar(field.Name.c_str(), ImGuiDataType_U8, &ubyteValue)) {
+						instance->SetFieldValue<uint8_t>(field.Name, ubyteValue);
+					}
+					break;
+				}
+				case ScriptFieldType::UShort: {
+					uint16_t ushortValue = instance->GetFieldValue<uint16_t>(field.Name);
+					if (ImGui::DragScalar(field.Name.c_str(), ImGuiDataType_U16, &ushortValue)) {
+						instance->SetFieldValue<uint16_t>(field.Name, ushortValue);
+					}
+					break;
+				}
+				case ScriptFieldType::UInt: {
+					uint32_t uintValue = instance->GetFieldValue<uint32_t>(field.Name);
+					if (ImGui::DragScalar(field.Name.c_str(), ImGuiDataType_U32, &uintValue)) {
+						instance->SetFieldValue<uint32_t>(field.Name, uintValue);
+					}
+					break;
+				}
+				case ScriptFieldType::ULong: {
+					uint64_t ulongValue = instance->GetFieldValue<uint64_t>(field.Name);
+					if (ImGui::DragScalar(field.Name.c_str(), ImGuiDataType_U64, &ulongValue)) {
+						instance->SetFieldValue<uint64_t>(field.Name, ulongValue);
+					}
+					break;
+				}
+				case ScriptFieldType::Vector2:
+					glm::vec2 vec2Value = instance->GetFieldValue<glm::vec2>(field.Name);
+					if (ImGui::DragFloat2(field.Name.c_str(), &vec2Value.x)) {
+						instance->SetFieldValue<glm::vec2>(field.Name, vec2Value);
+					}
+					break;
+				case ScriptFieldType::Vector3:
+					glm::vec3 vec3Value = instance->GetFieldValue<glm::vec3>(field.Name);
+					if (ImGui::DragFloat3(field.Name.c_str(), &vec3Value.x)) {
+						instance->SetFieldValue<glm::vec3>(field.Name, vec3Value);
+					}
+					break;
+				case ScriptFieldType::Vector4:
+					glm::vec4 vec4Value = instance->GetFieldValue<glm::vec4>(field.Name);
+					if (ImGui::DragFloat4(field.Name.c_str(), &vec4Value.x)) {
+						instance->SetFieldValue<glm::vec4>(field.Name, vec4Value);
+					}
+					break;
+				case ScriptFieldType::Entity:
+					break;
+			};
 		}
 	}
 
@@ -311,7 +433,7 @@ namespace RealEngine {
 		dispatcher.Dispatch<PanelEntityDeselectEvent>(RE_BIND_EVENT_FN(PropertiesPanel::DeselectEntityEvent));
 
 		dispatcher.Dispatch<ProjectChangeEvent>([this](ProjectChangeEvent& e) {
-			m_ValidScriptClasses = Project::GetScriptEngine()->GetValidScriptClasses();
+			m_ScriptClassFieldMap = Project::GetScriptEngine()->GetAllClassFields();
 
 			return false;
 		});

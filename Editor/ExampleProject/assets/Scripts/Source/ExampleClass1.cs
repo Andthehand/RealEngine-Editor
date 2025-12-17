@@ -10,10 +10,14 @@ public sealed class CustomAttribute : Attribute
 
 [Custom(Value = -2500.0f)]
 public class ExampleClass1 : Entity {
-	void OnCreate() {
+	public Vector2 temp1;
+	public Vector3 temp2;
+	public Vector4 temp3;
+
+    void OnCreate() {
         Logger.Warn($"ExampleClass Entity Id is : {ID}");
 		unsafe {
-			Entity clone = Instantiate(this);
+			//Entity clone = Instantiate(this);
         }
     }
 

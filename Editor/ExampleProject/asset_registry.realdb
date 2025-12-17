@@ -6,3 +6,17 @@ Assets:
       MipLevels: 1
       WrapMode: 10497
       FilterMode: 9985
+  - Handle: 2148249563
+    FilePath: Textures\circle.png
+    Type: 1
+    CustomMetadata:
+      MipLevels: 1
+      WrapMode: 10497
+      FilterMode: 9985
+  - Handle: 1535619548
+    FilePath: Textures\Dot.png
+    Type: 1
+    CustomMetadata:
+      MipLevels: 1
+      WrapMode: 10497
+      FilterMode: 9985
