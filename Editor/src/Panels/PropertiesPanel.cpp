@@ -249,26 +249,30 @@ namespace RealEngine {
 					}
 					break;
 				}
-				case ScriptFieldType::Vector2:
+				case ScriptFieldType::Vector2: {
 					glm::vec2 vec2Value = instance->GetFieldValue<glm::vec2>(field.Name);
 					if (ImGui::DragFloat2(field.Name.c_str(), &vec2Value.x)) {
 						instance->SetFieldValue<glm::vec2>(field.Name, vec2Value);
 					}
 					break;
-				case ScriptFieldType::Vector3:
+				}
+				case ScriptFieldType::Vector3: {
 					glm::vec3 vec3Value = instance->GetFieldValue<glm::vec3>(field.Name);
 					if (ImGui::DragFloat3(field.Name.c_str(), &vec3Value.x)) {
 						instance->SetFieldValue<glm::vec3>(field.Name, vec3Value);
 					}
 					break;
-				case ScriptFieldType::Vector4:
+				}
+				case ScriptFieldType::Vector4: {
 					glm::vec4 vec4Value = instance->GetFieldValue<glm::vec4>(field.Name);
 					if (ImGui::DragFloat4(field.Name.c_str(), &vec4Value.x)) {
 						instance->SetFieldValue<glm::vec4>(field.Name, vec4Value);
 					}
 					break;
-				case ScriptFieldType::Entity:
+				}
+				case ScriptFieldType::Entity: {
 					break;
+				}
 			};
 		}
 	}
