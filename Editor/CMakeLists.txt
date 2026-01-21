@@ -17,7 +17,11 @@ include_directories(Editor PRIVATE
 
 target_link_libraries(Editor RealEngine)
 
-file(COPY assets DESTINATION "${CMAKE_BINARY_DIR}/Editor")
+add_custom_command(TARGET Editor 
+	POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/assets ${CMAKE_CURRENT_BINARY_DIR}/assets
+	VERBATIM)
+
 file(COPY imgui.ini DESTINATION "${CMAKE_BINARY_DIR}/Editor")
 
 if(BUILD_DOCS)

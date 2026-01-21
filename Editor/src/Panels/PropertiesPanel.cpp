@@ -39,6 +39,16 @@ namespace RealEngine {
 			ImGui::ColorEdit4(("##" + label).c_str(), &color->x);
 		}
 
+		void DrawColorEdit3(const std::string& label, glm::vec3* color, float labelWidth = 110.0f) {
+			ImGui::TextUnformatted(label.c_str());
+
+			ImGui::SameLine();
+			ImGui::SetCursorPosX(labelWidth);
+
+			ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x);
+			ImGui::ColorEdit3(("##" + label).c_str(), &color->x);
+		}
+
 		int OpenGLFilterToArrayIndex(TextureFilterMode filter) {
 			switch(filter) {
 				case TextureFilterMode::NEAREST: return 0;
@@ -134,6 +144,16 @@ namespace RealEngine {
 				}
 			}
 		}
+	}
+
+	template<>
+	void PropertiesPanel::DisplayComponent<TextRendererComponent>(TextRendererComponent* component) {
+		RE_PROFILE_FUNCTION();
+
+		ImGui::TextUnformatted("Text");
+		ImGui::InputTextMultiline("##Text", &component->Text, ImVec2(ImGui::GetContentRegionAvail().x, ImGui::GetTextLineHeight() * 5));
+
+		Utils::DrawColorEdit4("Color", &component->Color);
 	}
 
 	template<>
