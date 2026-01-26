@@ -4,6 +4,7 @@ layout (location = 0) in vec2 vertex; // <vec2 pos>
 
 out VS_OUT {
     vec2 TexCoords;
+	flat vec4 Color;
     flat int index;
 } vs_out;
 
@@ -13,19 +14,26 @@ layout (std140, binding = 0) uniform Camera {
 };
 
 struct GlyphData {
-	mat4 Transform;
-	vec4 Color;
+	vec2 Position;
+	vec2 Size;
+
 	vec2 UV[4];
 };
 
 layout (std430, binding = 1) buffer TextData {
-    GlyphData glyphs[];
+		mat4 Transform;
+		vec4 Color;
+		GlyphData Glyphs[];
 };
 
 void main() {
-    gl_Position = viewProjection * glyphs[gl_InstanceID].Transform * vec4(vertex.xy, 0.0, 1.0);
+	vec2 localPos = Glyphs[gl_InstanceID].Position + vertex * Glyphs[gl_InstanceID].Size;
+	vec4 worldPos = Transform * vec4(localPos, 0.0, 1.0);
+	gl_Position = viewProjection * worldPos;
+
     vs_out.index = gl_InstanceID;
-    vs_out.TexCoords = glyphs[gl_InstanceID].UV[gl_VertexID];
+	vs_out.Color = Color;
+    vs_out.TexCoords = Glyphs[gl_InstanceID].UV[gl_VertexID];
 }
 
 #type fragment
@@ -34,20 +42,11 @@ out vec4 o_Color;
 
 in VS_OUT {
     vec2 TexCoords;
+	flat vec4 Color;
     flat int index;
 } fs_in;
 
 layout (binding = 0) uniform sampler2D u_FontAtlas;
-
-struct GlyphData {
-	mat4 Transform;
-	vec4 Color;
-	vec2 UV[4];
-};
-
-layout (std430, binding = 1) buffer TextData {
-    GlyphData glyphs[];
-};
 
 float screenPxRange() {
 	const float pxRange = 2.0; // set to distance field's pixel range
@@ -65,11 +64,11 @@ void main() {
     float sd = median(msd.r, msd.g, msd.b);
     float screenPxDistance = screenPxRange()*(sd - 0.5);
     float opacity = clamp(screenPxDistance + 0.5, 0.0, 1.0);
-	//if (opacity == 0.0)
-	//	discard;
+	if (opacity == 0.0)
+		discard;
 
 	vec4 bgColor = vec4(0.0);
-    o_Color = mix(bgColor, glyphs[fs_in.index].Color, opacity);
+    o_Color = mix(bgColor, fs_in.Color, opacity);
 	if (o_Color.a == 0.0)
 		discard;
 
