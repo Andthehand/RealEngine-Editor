@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 namespace RealEngine {
     [StructLayout(LayoutKind.Sequential)]
     public struct TextRendererComponent {
-        // 40 Byte padding
+        // 40 Byte padding because std::string is not blittable
         private long _A;
         private long _B;
         private long _C; 

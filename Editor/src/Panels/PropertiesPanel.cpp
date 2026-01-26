@@ -163,7 +163,7 @@ namespace RealEngine {
 				AssetHandle handle = Project::GetAssetManager().ImportAssetIfNeeded(texturePath);
 
 				if (handle) {
-					component->Font = Project::GetAssetManager().GetAsset<Font>(handle);
+					component->TextFont = Project::GetAssetManager().GetAsset<Font>(handle);
 				}
 			}
 		}
@@ -304,6 +304,9 @@ namespace RealEngine {
 					break;
 				}
 				case ScriptFieldType::Entity: {
+					break;
+				}
+				case ScriptFieldType::Unknown: {
 					break;
 				}
 			};
