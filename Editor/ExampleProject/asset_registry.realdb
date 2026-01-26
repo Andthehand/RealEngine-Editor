@@ -20,3 +20,6 @@ Assets:
       MipLevels: 1
       WrapMode: 10497
       FilterMode: 9985
+  - Handle: 2044980630
+    FilePath: Fonts\OpenSans-Regular.ttf
+    Type: 3

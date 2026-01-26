@@ -154,6 +154,19 @@ namespace RealEngine {
 		ImGui::InputTextMultiline("##Text", &component->Text, ImVec2(ImGui::GetContentRegionAvail().x, ImGui::GetTextLineHeight() * 5));
 
 		Utils::DrawColorEdit4("Color", &component->Color);
+
+		if (ImGui::Button("Font")) {
+			const char* filter = "Font Files (*.ttf)\0*.ttf\0All Files (*.*)\0*.*\0";
+			std::filesystem::path texturePath = FileDialogs::OpenFile(filter);
+
+			if (!texturePath.empty()) {
+				AssetHandle handle = Project::GetAssetManager().ImportAssetIfNeeded(texturePath);
+
+				if (handle) {
+					component->Font = Project::GetAssetManager().GetAsset<Font>(handle);
+				}
+			}
+		}
 	}
 
 	template<>
