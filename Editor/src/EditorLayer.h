@@ -16,6 +16,7 @@ namespace RealEngine {
 	 *
 	 * This class manages rendering the ImGui-based UI, handling the framebuffer viewport,
 	 * and dispatching events to active panels like the File Explorer and Properties panel.
+	 * The First command line argument is treated as the project path to load on startup.
 	 */
 	class EditorLayer : public Layer {
 	public:
@@ -28,6 +29,8 @@ namespace RealEngine {
 		virtual void OnEvent(Event& event) override;
 
 	private:
+		void LoadProject();
+
 		void StartDockspace();
 		void EndDockspace();
 
@@ -36,10 +39,8 @@ namespace RealEngine {
 		// Shortcut/menu actions
 		void NewScene();
 		void OpenScene();
-		void SaveScene();
 
-		void NewProject();
-		void OpenProject();
+		// Also saves the scene if it has a valid file path
 		void SaveProject();
 
 	private:

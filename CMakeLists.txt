@@ -8,3 +8,4 @@ project(Engine)
 
 add_subdirectory(RealEngine)
 add_subdirectory(Editor)
+add_subdirectory(ProjectCreator)

@@ -1,7 +1,6 @@
 #include "PropertiesPanel.h"
 
 #include "Events/PanelEvents.h"
-#include "Events/GeneralEvents.h"
 
 #include <imgui.h>
 #include <misc/cpp/imgui_stdlib.h>
@@ -471,12 +470,6 @@ namespace RealEngine {
 
 		dispatcher.Dispatch<SceneChangedEvent>(RE_BIND_EVENT_FN(PropertiesPanel::DeselectEntityEvent));
 		dispatcher.Dispatch<PanelEntityDeselectEvent>(RE_BIND_EVENT_FN(PropertiesPanel::DeselectEntityEvent));
-
-		dispatcher.Dispatch<ProjectChangeEvent>([this](ProjectChangeEvent& e) {
-			m_ScriptClassFieldMap = Project::GetScriptEngine()->GetAllClassFields();
-
-			return false;
-		});
 	}
 
 	template<typename T>

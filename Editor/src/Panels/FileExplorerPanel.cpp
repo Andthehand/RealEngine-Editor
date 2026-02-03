@@ -18,19 +18,17 @@ namespace RealEngine {
 		RE_PROFILE_FUNCTION();
 
 		if (ImGui::Begin("File Explorer")) {
-			if (Project::IsFullyInitialized()) {
-				DrawNavigationBar();
+			DrawNavigationBar();
 
-				if(m_ThumbnailsLoaded == false) {
-					LoadThumbnails();
-					m_ThumbnailsLoaded = true;
-				}
+			if(m_ThumbnailsLoaded == false) {
+				LoadThumbnails();
+				m_ThumbnailsLoaded = true;
+			}
 
-				const int columnCount = CalculateColumnCount();
-				if (BeginFileTable(columnCount)) {
-					DrawDirectoryEntries(columnCount);
-					EndFileTable();
-				}
+			const int columnCount = CalculateColumnCount();
+			if (BeginFileTable(columnCount)) {
+				DrawDirectoryEntries(columnCount);
+				EndFileTable();
 			}
 		}
 

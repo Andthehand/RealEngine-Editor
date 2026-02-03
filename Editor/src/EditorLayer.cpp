@@ -1,7 +1,6 @@
 #include "EditorLayer.h"
 
 #include "Events/PanelEvents.h"
-#include "Events/GeneralEvents.h"
 
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include <imgui.h>
@@ -29,7 +28,8 @@ namespace RealEngine {
 		m_Framebuffer = Framebuffer::Create(spec);
 		m_EditorCamera.SetViewportSize((float)spec.Width, (float)spec.Height);
 
-		Project::CreateNewProject();
+		//TODO: Refactor
+		LoadProject();
 		m_FileExplorerPanel.SetCurrentDirectory(Project::GetAssetsPath());
 
 		m_PlayIcon = TextureImporter::LoadTexture2D("assets/icons/EditorLayer/play.png");
@@ -39,8 +39,7 @@ namespace RealEngine {
 	void EditorLayer::OnDetach() {
 		RE_PROFILE_FUNCTION();
 
-		// Cleans up the Scene data held in the project
-		Project::CreateNewProject();
+		Project::Delete();
 	}
 
 	void EditorLayer::OnUpdate(const float deltaTime) {
@@ -91,19 +90,7 @@ namespace RealEngine {
 				if (ImGui::MenuItem("Open Scene", "Ctrl+O")) {
 					OpenScene();
 				}
-				if (ImGui::MenuItem("Save Scene", "Ctrl+S")) {
-					SaveScene();
-				}
-
-				ImGui::Separator();
-
-				if (ImGui::MenuItem("New Project", "Ctrl+Shift+N")) {
-					NewProject();
-				}
-				if (ImGui::MenuItem("Open Project", "Ctrl+Shift+O")) {
-					OpenProject();
-				}
-				if (ImGui::MenuItem("Save Project", "Ctrl+Shift+S")) {
+				if (ImGui::MenuItem("Save", "Ctrl+S")) {
 					SaveProject();
 				}
 
@@ -212,6 +199,25 @@ namespace RealEngine {
 		m_PropertiesPanel.OnEvent(event);
 	}
 
+	void EditorLayer::LoadProject() {
+		bool projectLoaded = false;
+
+		const ApplicationCommandLineArgs& args = Application::Get().GetCommandLineArgs();
+		if (args.Count > 1) {
+			std::filesystem::path projectPath = Application::Get().GetCommandLineArgs()[1];
+			projectLoaded = Project::Load(projectPath);
+		}
+
+		while (!projectLoaded) {
+			std::filesystem::path path = FileDialogs::OpenFile("Real Engine Project (*.reproj)\0*.reproj\0");
+
+			if (!path.empty()) {
+				projectLoaded = Project::Load(path);
+				break;
+			}
+		}
+	}
+
 	void EditorLayer::StartDockspace() {
 		RE_PROFILE_FUNCTION();
 
@@ -256,16 +262,6 @@ namespace RealEngine {
 			OpenScene();
 		}
 		if (ImGui::Shortcut(ImGuiKey_S | ImGuiMod_Ctrl, ImGuiInputFlags_RouteGlobal)) {
-			SaveScene();
-		}
-
-		if (ImGui::Shortcut(ImGuiKey_N | ImGuiMod_Ctrl | ImGuiMod_Shift, ImGuiInputFlags_RouteGlobal)) {
-			NewProject();
-		}
-		if (ImGui::Shortcut(ImGuiKey_O | ImGuiMod_Ctrl | ImGuiMod_Shift, ImGuiInputFlags_RouteGlobal)) {
-			OpenProject();
-		}
-		if (ImGui::Shortcut(ImGuiKey_S | ImGuiMod_Ctrl | ImGuiMod_Shift, ImGuiInputFlags_RouteGlobal)) {
 			SaveProject();
 		}
 	}
@@ -282,11 +278,6 @@ namespace RealEngine {
 		RE_PROFILE_FUNCTION();
 		RE_RETURN_IF_SCENESTATE_PLAY();
 
-		if (!Project::IsFullyInitialized()) {
-			RE_CORE_WARN("Cannot open a scene when no project is loaded!");
-			return;
-		}
-
 		std::filesystem::path sceneFile = FileDialogs::OpenFile("Real Engine Scene (*.rescene)\0*.rescene\0");
 		
 		if (!sceneFile.empty()) {
@@ -294,57 +285,6 @@ namespace RealEngine {
 			Project::SetCurrentScene(CreateRef<Scene>(sceneFile));
 		} else {
 			RE_CORE_WARN("Scene open was canceled or failed!");
-		}
-	}
-
-	void EditorLayer::SaveScene() {
-		RE_PROFILE_FUNCTION();
-		RE_RETURN_IF_SCENESTATE_PLAY();
-
-		if (!Project::IsFullyInitialized()) {
-			RE_CORE_WARN("Cannot save a scene when no project is loaded!");
-			return;
-		}
-
-		if (Project::GetCurrentScene()->GetFilePath().empty()) {
-			std::filesystem::path sceneFile = FileDialogs::SaveFile("Real Engine Scene (*.rescene)\0*.rescene\0");
-			if (sceneFile.empty()) {
-				RE_CORE_WARN("Scene save was canceled or failed!");
-				return;
-			}
-
-			Project::GetCurrentScene()->SetFilePath(sceneFile);
-		}
-
-
-		Project::Save();
-	}
-
-	void EditorLayer::NewProject() {
-		RE_PROFILE_FUNCTION();
-		RE_RETURN_IF_SCENESTATE_PLAY();
-
-		Project::CreateNewProject();
-		m_FileExplorerPanel.SetCurrentDirectory(Project::GetProjectPath());
-
-		// Notify panels that the selected entity has been deselected/deleted
-		ProjectChangeEvent projectEvent;
-		RE_RAISE_EVENT(projectEvent);
-	}
-
-	void EditorLayer::OpenProject() {
-		RE_PROFILE_FUNCTION();
-		RE_RETURN_IF_SCENESTATE_PLAY();
-
-		std::filesystem::path projectFile = FileDialogs::OpenFile("Real Engine Project (*.reproj)\0*.reproj\0");
-		
-		if (!projectFile.empty()) {
-			Project::Load(projectFile);
-			m_FileExplorerPanel.SetCurrentDirectory(Project::GetProjectPath());
-
-			// Notify panels that the selected entity has been deselected/deleted
-			ProjectChangeEvent projectEvent;
-			RE_RAISE_EVENT(projectEvent);
 		}
 	}
 
