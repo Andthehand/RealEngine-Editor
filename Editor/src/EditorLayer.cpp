@@ -8,7 +8,7 @@
 
 #define RE_RETURN_IF_SCENESTATE_PLAY() \
 	if (m_SceneState == SceneState::Play) { \
-		MessageDialog::WarnDialog("Scene State Warning", "Cannot perform this action when in Play Mode"); \
+		MessageDialog::ErrorDialog("Scene State Warning", "Cannot perform this action when in Play Mode"); \
 		return; \
 	}
 
@@ -29,7 +29,6 @@ namespace RealEngine {
 		m_Framebuffer = Framebuffer::Create(spec);
 		m_EditorCamera.SetViewportSize((float)spec.Width, (float)spec.Height);
 
-		//TODO: Refactor
 		LoadProject();
 		m_FileExplorerPanel.SetCurrentDirectory(Project::GetAssetsPath());
 
@@ -198,6 +197,9 @@ namespace RealEngine {
 		if(m_ViewportFocused)
 			m_EditorCamera.OnEvent(event);
 		m_PropertiesPanel.OnEvent(event);
+
+		EventDispatcher dispatcher(event);
+		dispatcher.Dispatch<WindowCloseEvent>(RE_BIND_EVENT_FN(EditorLayer::OnWindowCloseEvent));
 	}
 
 	void EditorLayer::LoadProject() {
@@ -310,5 +312,13 @@ namespace RealEngine {
 		RE_RETURN_IF_SCENESTATE_PLAY();
 
 		Project::Save();
+	}
+
+	bool EditorLayer::OnWindowCloseEvent(WindowCloseEvent& e) {
+		RE_PROFILE_FUNCTION();
+		NMB::Result result = MessageDialog::WarnDialog("Exit Application", "Not saving will lose all progress!");
+
+		// Handle this event so that the application doesn't close
+		return result == NMB::Result::CANCEL;
 	}
 }

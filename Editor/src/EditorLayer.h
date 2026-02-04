@@ -27,7 +27,6 @@ namespace RealEngine {
 		virtual void OnUpdate(const float deltaTime) override;
 		virtual void OnImGui() override;
 		virtual void OnEvent(Event& event) override;
-
 	private:
 		void LoadProject();
 
@@ -43,6 +42,7 @@ namespace RealEngine {
 		// Also saves the scene if it has a valid file path
 		void SaveProject();
 
+		bool OnWindowCloseEvent(WindowCloseEvent& e);
 	private:
 		enum class SceneState {
 			Edit = 0,
