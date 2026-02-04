@@ -5,12 +5,6 @@
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include <imgui.h>
 
-#define RE_RETURN_IF_SCENESTATE_PLAY() \
-	if (m_SceneState == SceneState::Play) { \
-		InfoDialog::WarnUser("Scene State Warning", "Cannot perform this action when in Play Mode"); \
-		return; \
-	}
-
 namespace RealEngine {
 	EditorLayer::EditorLayer()
 		: Layer("Editor"), m_EditorCamera(90.0f, Application::Get().GetWindow().GetAspectRatio(), 0.0f, 1000.0f) { }
@@ -209,7 +203,9 @@ namespace RealEngine {
 		}
 
 		while (!projectLoaded) {
-			std::filesystem::path path = FileDialogs::OpenFile("Real Engine Project (*.reproj)\0*.reproj\0");
+			std::filesystem::path path = FileDialogs::OpenFile({
+				{.name = "Real Engine Project", .spec = "reproj"}
+			});
 
 			if (!path.empty()) {
 				projectLoaded = Project::Load(path);
@@ -268,17 +264,29 @@ namespace RealEngine {
 
 	void EditorLayer::NewScene() {
 		RE_PROFILE_FUNCTION();
-		RE_RETURN_IF_SCENESTATE_PLAY();
 
 		Project::GetCurrentScene()->Save();
+
+		Ref<Scene> newScene = CreateRef<Scene>();
+		while (newScene->GetFilePath().empty()) {
+			std::filesystem::path sceneFile = FileDialogs::SaveFile({
+				{.name = "Real Engine Scene", .spec = "rescene" }
+			});
+
+			if (!sceneFile.empty()) {
+				newScene->SetFilePath(sceneFile);
+			}
+		}
+
 		Project::SetCurrentScene(CreateRef<Scene>());
 	}
 
 	void EditorLayer::OpenScene() {
 		RE_PROFILE_FUNCTION();
-		RE_RETURN_IF_SCENESTATE_PLAY();
 
-		std::filesystem::path sceneFile = FileDialogs::OpenFile("Real Engine Scene (*.rescene)\0*.rescene\0");
+		std::filesystem::path sceneFile = FileDialogs::OpenFile({
+			{.name = "Real Engine Scene", .spec = "rescene" }
+		});
 		
 		if (!sceneFile.empty()) {
 			Project::GetCurrentScene()->Save();
@@ -290,7 +298,6 @@ namespace RealEngine {
 
 	void EditorLayer::SaveProject() {
 		RE_PROFILE_FUNCTION();
-		RE_RETURN_IF_SCENESTATE_PLAY();
 
 		Project::Save();
 	}

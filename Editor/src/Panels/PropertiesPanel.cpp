@@ -132,8 +132,10 @@ namespace RealEngine {
 
 		Utils::DrawColorEdit4("Color", &component->Color);
 		if (ImGui::Button("Texture")) {
-			const char* filter = "Image Files (*.png;*.jpg;*.jpeg)\0*.png;*.jpg;*.jpeg;*.bmp;*.tga\0All Files (*.*)\0*.*\0";
-			std::filesystem::path texturePath = FileDialogs::OpenFile(filter);
+			std::filesystem::path texturePath = FileDialogs::OpenFile({
+				{ .name = "Image Files", .spec = "png,jpg,jpeg,bmp,tga" },
+				{ .name = "All Files", .spec = "*" }
+			});
 
 			if (!texturePath.empty()) {
 				AssetHandle handle = Project::GetAssetManager().ImportAssetIfNeeded(texturePath);
@@ -156,7 +158,10 @@ namespace RealEngine {
 
 		if (ImGui::Button("Font")) {
 			const char* filter = "Font Files (*.ttf)\0*.ttf\0All Files (*.*)\0*.*\0";
-			std::filesystem::path texturePath = FileDialogs::OpenFile(filter);
+			std::filesystem::path texturePath = FileDialogs::OpenFile({
+				{.name = "Font Files", .spec = "ttf" },
+				{.name = "All Files", .spec = "*" }
+			});
 
 			if (!texturePath.empty()) {
 				AssetHandle handle = Project::GetAssetManager().ImportAssetIfNeeded(texturePath);

@@ -69,7 +69,7 @@ namespace RealEngine {
 		ImGui::InputTextWithHint("##Name", "MyProject", &projectName);
 		ImGui::SameLine();
 		if (ImGui::Button("Browse...")) {
-			std::filesystem::path path = FileDialogs::OpenFile();
+			std::filesystem::path path = FileDialogs::PickFolder();
 			if (!path.empty()) {
 				projectLocation = path.parent_path().string() + std::string(1, std::filesystem::path::preferred_separator);
 			}
