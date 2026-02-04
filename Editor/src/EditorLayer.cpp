@@ -5,6 +5,13 @@
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include <imgui.h>
 
+
+#define RE_RETURN_IF_SCENESTATE_PLAY() \
+	if (m_SceneState == SceneState::Play) { \
+		MessageDialog::WarnDialog("Scene State Warning", "Cannot perform this action when in Play Mode"); \
+		return; \
+	}
+
 namespace RealEngine {
 	EditorLayer::EditorLayer()
 		: Layer("Editor"), m_EditorCamera(90.0f, Application::Get().GetWindow().GetAspectRatio(), 0.0f, 1000.0f) { }
@@ -264,6 +271,7 @@ namespace RealEngine {
 
 	void EditorLayer::NewScene() {
 		RE_PROFILE_FUNCTION();
+		RE_RETURN_IF_SCENESTATE_PLAY();
 
 		Project::GetCurrentScene()->Save();
 
@@ -283,6 +291,7 @@ namespace RealEngine {
 
 	void EditorLayer::OpenScene() {
 		RE_PROFILE_FUNCTION();
+		RE_RETURN_IF_SCENESTATE_PLAY();
 
 		std::filesystem::path sceneFile = FileDialogs::OpenFile({
 			{.name = "Real Engine Scene", .spec = "rescene" }
@@ -298,6 +307,7 @@ namespace RealEngine {
 
 	void EditorLayer::SaveProject() {
 		RE_PROFILE_FUNCTION();
+		RE_RETURN_IF_SCENESTATE_PLAY();
 
 		Project::Save();
 	}
